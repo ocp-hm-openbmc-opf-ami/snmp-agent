@@ -11,7 +11,7 @@
 
 #include "snmpAgent.hpp"
 #include "netSnmpExamples.hpp"
-#include "netSnmpHostsTable2.hpp"
+#include "netSnmpHostsTable.hpp"
 
 //Dbus
 #include "config.h"
