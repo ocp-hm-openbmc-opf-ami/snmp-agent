@@ -30,7 +30,7 @@ constexpr auto sensorPaths = std::to_array<std::string_view>({
     "/xyz/openbmc_project/sensors/airflow",
     //"/xyz/openbmc_project/sensors/humidity",
     //"/xyz/openbmc_project/sensors/altitude",
-    //"/xyz/openbmc_project/sensors/energy",
+    "/xyz/openbmc_project/sensors/energy",
     //"/xyz/openbmc_project/sensors/utilization",
     "/xyz/openbmc_project/sensors/fan_tach",
     "/xyz/openbmc_project/sensors/temperature",
