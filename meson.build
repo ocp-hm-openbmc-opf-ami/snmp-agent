@@ -24,6 +24,7 @@ sdeventplus = dependency('sdeventplus')
 
 
 phosphor_logging_dep = dependency('phosphor-logging')
+phosphor_snmp_dep = dependency('phosphor-snmp')
 systemd_dep = dependency('systemd')
 
 netsnmp_dep = dependency('netsnmp')
@@ -32,11 +33,12 @@ cpp = meson.get_compiler('cpp')
 
 snmp_agent_dep = [
      phosphor_logging_dep,
+     phosphor_snmp_dep,
      systemd_dep,
      phosphor_dbus_interfaces,
      sdbusplus,
      sdeventplus,
-     netsnmp_dep
+     netsnmp_dep,
 ]
 
 snmp_agent_src = [
@@ -45,7 +47,8 @@ snmp_agent_src = [
      'netSnmpExamples.cpp',
      'netSnmpExamples.hpp',
      'netSnmpHostsTable.cpp',
-     'netSnmpHostsTable.hpp'
+     'netSnmpHostsTable.hpp',
+     'snmpUtils.hpp'
 ]
 
 executable(

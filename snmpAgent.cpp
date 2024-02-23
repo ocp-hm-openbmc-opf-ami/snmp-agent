@@ -12,7 +12,7 @@
 #include "snmpAgent.hpp"
 #include "netSnmpExamples.hpp"
 #include "netSnmpHostsTable.hpp"
-
+#include "snmpUtils.hpp"
 //Dbus
 #include "config.h"
 #include <sdbusplus/sdbus.hpp>
@@ -563,6 +563,16 @@ int main(int argc, char** argv)
 
     //lg2::debug("Welcome to SNMP Agent");
 
+    if (!std::filesystem::exists(SnmpTrapStatusFile)) {
+        std::ofstream file(SnmpTrapStatusFile, std::ios::out);
+        if (file.is_open()) {
+        file << std::boolalpha << false << std::endl;
+        file.close();
+        }
+        else{
+            std::cerr << "Unable to open file" << SnmpTrapStatusFile << std::endl;
+       }
+    }
 
   if(0)
     {
@@ -572,12 +582,11 @@ int main(int argc, char** argv)
 
   auto bus = sdbusplus::bus::new_default();
 
-  // Claim the bus now
+
+  sdbusplus::server::manager_t objManager(bus, "xyz.openbmc_project.Snmp");
   bus.request_name("xyz.openbmc_project.Snmp");
-
-  sdbusplus::server::manager_t objManager(bus, snmpAgentRoot);
-
-  SnmpAgentImp snmpAgentManager(bus, snmpAgentRoot);
+  auto manager = std::make_unique<SnmpUtilsManager>(bus, snmpAgentRoot);
+  auto manager1 = std::make_unique<SnmpAgentImp>(bus, snmpAgentRoot);
 
   // Wait for client request
   bus.process_loop();
