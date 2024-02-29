@@ -568,7 +568,7 @@ int main(int argc, char** argv)
     if (!std::filesystem::exists(SnmpTrapStatusFile)) {
         std::ofstream file(SnmpTrapStatusFile, std::ios::out);
         if (file.is_open()) {
-        file << std::boolalpha << false << std::endl;
+        file << std::boolalpha << true << std::endl;
         file.close();
         }
         else{

@@ -63,7 +63,13 @@ class SnmpUtilsManager : public SNMPIface
 
         bool sendSNMPTrap() override
         {
-            sendTrap<OBMCErrorNotification>(0,0,0,"Test Alert");
+            std::time_t currentTime = std::time(nullptr);
+            struct tm *timeInfo = std::localtime(&currentTime);
+
+            char TrapGenerateTime[80];
+            std::strftime(TrapGenerateTime, sizeof(TrapGenerateTime), "%a %b %d %H:%M:%S %Z %Y", timeInfo);
+
+            sendTrap<OBMCErrorNotification>(0,TrapGenerateTime,"NA","Test Alert");
             return true;
         }
 
