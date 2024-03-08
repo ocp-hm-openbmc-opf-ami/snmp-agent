@@ -48,7 +48,9 @@ snmp_agent_src = [
      'netSnmpExamples.hpp',
      'netSnmpHostsTable.cpp',
      'netSnmpHostsTable.hpp',
-     'snmpUtils.hpp'
+     'netSnmpControlSmtp.cpp',
+     'netSnmpControlSmtp.hpp',
+     'snmpUtils.hpp',
 ]
 
 executable(
