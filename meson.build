@@ -50,6 +50,8 @@ snmp_agent_src = [
      'netSnmpHostsTable.hpp',
      'netSnmpControlSmtp.cpp',
      'netSnmpControlSmtp.hpp',
+     'snmpModifyConf.cpp',
+     'snmpModifyConf.hpp',
      'snmpUtils.hpp',
 ]
 

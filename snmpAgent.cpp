@@ -10,18 +10,21 @@
  *****************************************************************/
 
 #include "snmpAgent.hpp"
+#include "netSnmpControlSmtp.hpp"
 #include "netSnmpExamples.hpp"
 #include "netSnmpHostsTable.hpp"
-#include "netSnmpControlSmtp.hpp"
+#include "snmpModifyConf.hpp"
 #include "snmpUtils.hpp"
+
 //Dbus
 #include "config.h"
-#include <sdbusplus/sdbus.hpp>
+#include <boost/asio/io_context.hpp>
+#include <getopt.h>
+#include <sdbusplus/asio/object_server.hpp>
 #include <sdbusplus/bus.hpp>
+#include <sdbusplus/sdbus.hpp>
 #include <sdbusplus/server/object.hpp>
 #include <xyz/openbmc_project/Snmp/SnmpAgent/server.hpp>
-
-#include <getopt.h>
 
 #include <iostream>
 #include <filesystem>
@@ -568,32 +571,52 @@ int main(int argc, char** argv)
     if (!std::filesystem::exists(SnmpTrapStatusFile)) {
         std::ofstream file(SnmpTrapStatusFile, std::ios::out);
         if (file.is_open()) {
-        file << std::boolalpha << true << std::endl;
-        file.close();
+          file << std::boolalpha << true << std::endl;
+          file.close();
         }
         else{
             std::cerr << "Unable to open file" << SnmpTrapStatusFile << std::endl;
-       }
+        }
     }
 
-  if(0)
-    {
+    if (0) {
       argc = argc;
       argv = argv;
     }
 
-  auto bus = sdbusplus::bus::new_default();
+    boost::asio::io_context io;
+    auto conn = std::make_shared<sdbusplus::asio::connection>(io);
 
+    // Snmp Object Manager
+    sdbusplus::server::manager_t objManager(*conn, "xyz.openbmc_project.Snmp");
+    conn->request_name("xyz.openbmc_project.Snmp");
 
-  sdbusplus::server::manager_t objManager(bus, "xyz.openbmc_project.Snmp");
-  bus.request_name("xyz.openbmc_project.Snmp");
-  auto manager = std::make_unique<SnmpUtilsManager>(bus, snmpAgentRoot);
-  auto manager1 = std::make_unique<SnmpAgentImp>(bus, snmpAgentRoot);
+    // Snmp Utils Manager
+    auto manager = std::make_unique<SnmpUtilsManager>(*conn, snmpAgentRoot);
+    auto manager1 = std::make_unique<SnmpAgentImp>(*conn, snmpAgentRoot);
 
-  // Wait for client request
-  bus.process_loop();
+    auto server = sdbusplus::asio::object_server(conn);
 
+    auto ifaceSnmpUtils = server.add_interface(
+        snmpAgentRoot, "xyz.openbmc_project.Snmp.SnmpUtils");
+    registerSnmpUtilsDbus(ifaceSnmpUtils);
 
+    auto ifaceSnmpdConf = server.add_interface(
+        snmpAgentRoot, "xyz.openbmc_project.Snmp.SnmpdConf");
+    registerSnmpdDbus(ifaceSnmpdConf);
 
-  return -1;
+    auto ifaceSnmpConf = server.add_interface(
+        snmpAgentRoot, "xyz.openbmc_project.Snmp.SnmpConf");
+    registerSnmpDbus(ifaceSnmpConf);
+
+    if (!std::filesystem::exists(snmpdConfExtFileDir)) {
+      if (!addCommunityString("rwcommunity", "AMI", "smtp")) {
+        std::cerr << " Fail to create AMI extented community string"
+                  << std::endl;
+      }
+    }
+
+    io.run();
+
+    return -1;
 }
