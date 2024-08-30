@@ -812,7 +812,7 @@ std::vector<std::string> getServicePath(std::string_view path, std::string& intf
 	//std::vector<std::string> mapperResponse;
 	mapperResponseMsg.read(mapperResponse);
       }
-    catch (const std::bad_variant_access& e)
+    catch (const sdbusplus::exception::SdBusError& e)
       {
 	fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
 	fpchassis << "Failed" << std::endl;
