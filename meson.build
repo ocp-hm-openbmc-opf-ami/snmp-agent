@@ -53,6 +53,8 @@ snmp_agent_src = [
      'snmpModifyConf.cpp',
      'snmpModifyConf.hpp',
      'snmpUtils.hpp',
+     'netSnmpAmiHandle.hpp',
+     'netSnmpAmiHandle.cpp'
 ]
 
 executable(

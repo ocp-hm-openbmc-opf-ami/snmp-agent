@@ -15,6 +15,7 @@
 #include "netSnmpHostsTable.hpp"
 #include "snmpModifyConf.hpp"
 #include "snmpUtils.hpp"
+#include "netSnmpAmiHandle.hpp"
 
 //Dbus
 #include "config.h"
@@ -615,6 +616,8 @@ int main(int argc, char** argv)
                   << std::endl;
       }
     }
+
+    initialize_amiHandlers();
 
     io.run();
 
