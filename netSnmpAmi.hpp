@@ -19,14 +19,15 @@
 #include <tuple>
 
 
-#ifndef NETSNMPCONTROLSMTP_H
-#define NETSNMPCONTROLSMTP_H
+#ifndef NETSNMPAMI_H
+#define NETSNMPAMI_H
 const std::string tempChassisFilepath = "/tmp/chassis.tmp";
 
-void init_netSnmpControlSmtpScalars(void);
+void init_netSnmpAMIScalars(void);
 
 Netsnmp_Node_Handler handle_amiSnmpSMTPPriStatus;
 Netsnmp_Node_Handler handle_amiSnmpSMTPSecStatus;
-
-#endif /* NETSNMPCONTROLSMTP_H */
+Netsnmp_Node_Handler handle_amiACD_DataArea;
+Netsnmp_Node_Handler handle_amiACD_Trigger;
+#endif /* NETSNMPAMI_H */
 

@@ -10,7 +10,7 @@
  *****************************************************************/
 
 #include "snmpAgent.hpp"
-#include "netSnmpControlSmtp.hpp"
+#include "netSnmpAmi.hpp"
 #include "netSnmpExamples.hpp"
 #include "netSnmpHostsTable.hpp"
 #include "snmpModifyConf.hpp"
@@ -508,7 +508,7 @@ private:
     /* mib code: init_nstAgentSubagentObject from nstAgentSubagentObject.C */
     //init_netSnmpExampleScalars();
     init_netSnmpHostsTable();
-    init_netSnmpControlSmtpScalars();
+    init_netSnmpAMIScalars();
 
     
     //init_nstAgentSubagentObject();
