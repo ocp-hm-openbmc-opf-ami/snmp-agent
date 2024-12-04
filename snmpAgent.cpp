@@ -617,9 +617,11 @@ int main(int argc, char** argv)
       }
     }
 
-    initialize_amiHandlers();
+    auto eventHandler = std::async(std::launch::async, initialize_amiHandlers);
 
     io.run();
 
+    eventHandler.wait();
+	    
     return -1;
 }
