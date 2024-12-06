@@ -8,6 +8,8 @@
 #include <net-snmp/agent/net-snmp-agent-includes.h>
 #include <net-snmp/agent/var_struct.h>
 #include "netSnmpAmiHandle.hpp"
+#include "netSnmpAmi.hpp"
+#include "netSnmpHostsTable.hpp"
 
 #include <signal.h>
 
@@ -45,6 +47,8 @@ void initialize_amiHandlers(void)
     /* initialize the agent library */
     init_agent("ami-snmp-agent-deamon");
 
+    init_netSnmpHostsTable();
+    init_netSnmpAMIScalars();
     init_netSnmpAmiSensorTable();
     init_netSnmpAmiDiscreteSensorTable();
     init_netSnmpAmiUserInfoTable();
