@@ -31,3 +31,4 @@
 
 extern void init_usmUser(void);
 extern void init_vacm_vars(void);
+int initialize_amiHandlers (void);

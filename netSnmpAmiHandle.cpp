@@ -28,7 +28,7 @@ static amiHandleDiscreteSensorTable_entry *discreteSensorData_head = NULL;
 static amiHandleUserInfoTable_entry *userInfoData_head = NULL;
 
 #define getUserName getSensorName
-
+#if 0
 void initialize_amiHandlers(void)
 {
     int agentx_subagent=1;
@@ -74,6 +74,7 @@ void initialize_amiHandlers(void)
 
     return ;
 }
+#endif
 
 std::string getSensorName(std::string Str)
 {

@@ -139,12 +139,7 @@ int handle_amiACD_DataArea(netsnmp_mib_handler *handler,
 
     int ret = 0;
     uint16_t dataArea = 0;
-
-    if(0)
-    {
-        reginfo = reginfo;
-        handler = handler;
-    }
+    std::cout << "reqinfo->mode " << reqinfo->mode<< reginfo->modes << handler->flags << std::endl;
 
     switch(reqinfo->mode) {
         case MODE_GET:
@@ -212,11 +207,7 @@ int handle_amiACD_Trigger(netsnmp_mib_handler *handler,
 {
     int ret = 0;
     std::string action;
-    if(0)
-    {
-        reginfo = reginfo;
-        handler = handler;
-    }
+    std::cout << "reqinfo->mode " << reqinfo->mode<< reginfo->modes << handler->flags << std::endl;
 
     switch(reqinfo->mode) {
         case MODE_GET:
@@ -288,52 +279,31 @@ int handle_amiSnmpSMTPPriStatus(netsnmp_mib_handler *handler,
     std::cout << "handle_amiSnmpSMTPPriStatus" << std::endl;
     
 
-    std::ofstream fpchassis;
-    fpchassis.open(tempChassisFilepath,std::ios_base::app);
-    fpchassis << "handle ami Snmp  SMTP status "  << std::endl;
-    fpchassis.close();
     int status = 1;
 
-    if(0)
-    {
-        reginfo = reginfo;
-        handler = handler;
-    }
-    std::cout << "reqinfo->mode " << reqinfo->mode << std::endl;
+    std::cout << "reqinfo->mode " << reqinfo->mode<< reginfo->modes << handler->flags << std::endl;
 
     switch(reqinfo->mode) {
         case MODE_GET:
             getDbusProperty(smtpclient, smtpObj, smtpPriIntf, "Enable", variant);
             status = std::get<bool>(variant);
             snmp_set_var_typed_value(requests->requestvb, ASN_INTEGER,(u_char *)&status, sizeof(int));
-            fpchassis.open(tempChassisFilepath,std::ios_base::app);
-            fpchassis << "Handle ami snmp SMTP status MODE GET " << std::endl;
-            fpchassis.close();
             break;
 
         case MODE_SET_RESERVE1:
             ret = netsnmp_check_vb_type(requests->requestvb, ASN_INTEGER);
-            fpchassis.open(tempChassisFilepath,std::ios_base::app);
-            fpchassis << "Handle ami snmp SMTP status MODE SET RESERVE1 " << std::endl;
-            fpchassis.close();
             if ( ret != SNMP_ERR_NOERROR ) {
                 netsnmp_set_request_error(reqinfo, requests, ret );
             }
             break;
 
         case MODE_SET_RESERVE2:
-            fpchassis.open(tempChassisFilepath,std::ios_base::app);
-            fpchassis << "Handle ami snmp SMTP status MODE SET RESERVE2 " << std::endl;
-            fpchassis.close();
             if (/* XXX if malloc, or whatever, failed: */0) {
                 netsnmp_set_request_error(reqinfo, requests, SNMP_ERR_RESOURCEUNAVAILABLE);
             }
             break;
 
         case MODE_SET_FREE:
-            fpchassis.open(tempChassisFilepath,std::ios_base::app);
-            fpchassis << "Handle ami snmp SMTP status MODE SET FREE " << std::endl;
-            fpchassis.close();
             break;
 
         case MODE_SET_ACTION:
@@ -345,27 +315,15 @@ int handle_amiSnmpSMTPPriStatus(netsnmp_mib_handler *handler,
             variant = (status != 0);
             setDbusProperty(smtpclient, smtpObj, smtpPriIntf, "Enable", variant);                    
             snmp_set_var_typed_value(requests->requestvb, ASN_INTEGER, (u_char *)&status, sizeof(status));
-            fpchassis.open(tempChassisFilepath,std::ios_base::app);
-            fpchassis << "Handle ami snmp SMTP status MODE SET ACTION " << std::endl;
-            fpchassis.close();
             break;
 
         case MODE_SET_COMMIT:
-            fpchassis.open(tempChassisFilepath,std::ios_base::app);
-            fpchassis << "Handle ami snmp SMTP status MODE SET COMMIT" << std::endl;
-            fpchassis.close();
             break;
 
         case MODE_SET_UNDO:
-            fpchassis.open(tempChassisFilepath,std::ios_base::app);
-            fpchassis << "Handle ami snmp SMTP status MODE SET UNDO " << std::endl;
-            fpchassis.close();
             break;
 
         default:
-            fpchassis.open(tempChassisFilepath,std::ios_base::app);
-            fpchassis << "Handle ami snmp SMTP status DEFAULT " << std::endl;
-            fpchassis.close();
             snmp_log(LOG_ERR, "unknown mode (%d) in handle_amiSnmp_SMTP_status\n", reqinfo->mode );
             std::cout << "no mode" << std::endl;
             return SNMP_ERR_GENERR;
@@ -387,19 +345,10 @@ int handle_amiSnmpSMTPSecStatus(netsnmp_mib_handler *handler,
     auto bus = sdbusplus::bus::new_default();
     
 
-    std::ofstream fpchassis;
-    fpchassis.open(tempChassisFilepath,std::ios_base::app);
-    fpchassis << "handle ami Snmp  SMTP status "  << std::endl;
-    fpchassis.close();
 
     int status;
 
-    if(0)
-    {
-       reginfo = reginfo;
-       handler = handler;
-    }
-    std::cout << "reqinfo->mode " << reqinfo->mode << std::endl;
+    std::cout << "reqinfo->mode " << reqinfo->mode << reginfo->modes<< handler->flags <<std::endl;
 
     switch(reqinfo->mode) {
         case MODE_GET:
@@ -407,34 +356,22 @@ int handle_amiSnmpSMTPSecStatus(netsnmp_mib_handler *handler,
             status = std::get<bool>(variant);
             snmp_set_var_typed_value(requests->requestvb, ASN_INTEGER,
                                  (u_char *)&status, sizeof(int));
-            fpchassis.open(tempChassisFilepath,std::ios_base::app);
-            fpchassis << "Handle ami snmp SMTP status MODE GET " << std::endl;
-            fpchassis.close();
             break;
 
         case MODE_SET_RESERVE1:
             ret = netsnmp_check_vb_type(requests->requestvb, ASN_INTEGER);
-            fpchassis.open(tempChassisFilepath,std::ios_base::app);
-            fpchassis << "Handle ami snmp SMTP status MODE SET RESERVE1 " << std::endl;
-            fpchassis.close();
             if ( ret != SNMP_ERR_NOERROR ) {
                 netsnmp_set_request_error(reqinfo, requests, ret );
             }
             break;
 
         case MODE_SET_RESERVE2:
-            fpchassis.open(tempChassisFilepath,std::ios_base::app);
-            fpchassis << "Handle ami snmp SMTP status MODE SET RESERVE2 " << std::endl;
-            fpchassis.close();
             if (/* XXX if malloc, or whatever, failed: */0) {
                 netsnmp_set_request_error(reqinfo, requests, SNMP_ERR_RESOURCEUNAVAILABLE);
             }
             break;
 
         case MODE_SET_FREE:
-            fpchassis.open(tempChassisFilepath,std::ios_base::app);
-            fpchassis << "Handle ami snmp SMTP status MODE SET FREE " << std::endl;
-            fpchassis.close();
             break;
 
         case MODE_SET_ACTION:
@@ -446,27 +383,15 @@ int handle_amiSnmpSMTPSecStatus(netsnmp_mib_handler *handler,
             variant = (status != 0);
             setDbusProperty(smtpclient, smtpObj, smtpSecIntf, "Enable", variant);
             snmp_set_var_typed_value(requests->requestvb, ASN_INTEGER, (u_char *)&status, sizeof(status));
-            fpchassis.open(tempChassisFilepath,std::ios_base::app);
-            fpchassis << "Handle ami snmp SMTP status MODE SET ACTION " << std::endl;
-            fpchassis.close();
             break;
 
         case MODE_SET_COMMIT:
-            fpchassis.open(tempChassisFilepath,std::ios_base::app);
-            fpchassis << "Handle ami snmp SMTP status MODE SET COMMIT" << std::endl;
-            fpchassis.close();
             break;
 
         case MODE_SET_UNDO:
-            fpchassis.open(tempChassisFilepath,std::ios_base::app);
-            fpchassis << "Handle ami snmp SMTP status MODE SET UNDO " << std::endl;
-            fpchassis.close();
             break;
 
         default:
-            fpchassis.open(tempChassisFilepath,std::ios_base::app);
-            fpchassis << "Handle ami snmp SMTP status DEFAULT " << std::endl;
-            fpchassis.close();
             snmp_log(LOG_ERR, "unknown mode (%d) in handle_amiSnmp_SMTP_status\n", reqinfo->mode );
             std::cout << "no mode" << std::endl;
             return SNMP_ERR_GENERR;

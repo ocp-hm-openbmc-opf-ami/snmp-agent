@@ -47,7 +47,6 @@ dbusPropVariant getDbusProperty(const std::string& service,
                             const std::string& property);
 
 /* function declarations */
-void initialize_amiHandlers(void);
 void init_netSnmpAmiSensorTable(void);
 void init_netSnmpAmiDiscreteSensorTable(void);
 

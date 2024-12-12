@@ -67,20 +67,8 @@ handle_amiSnmpInteger(netsnmp_mib_handler *handler,
 {
     int ret;
     int amiInt=0;
-    std::ofstream fpchassis;
     ObjUsr objects;
     
-    fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-    fpchassis << "handle SNMP Integer "  << std::endl;
-    fpchassis.close();
-
-    if(0)
-      {
-	reginfo = reginfo;
-	handler = handler;
-      }
-
-
     std::string basePath = "/xyz/openbmc_project/sensors/temperature/BMC_Temp";
     std::string interface = "xyz.openbmc_project.Sensor.Value";
 
@@ -92,9 +80,6 @@ handle_amiSnmpInteger(netsnmp_mib_handler *handler,
       {
 	for (const auto& [path, interfaces] : objects)
 	  {
-	    fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-	    fpchassis << "find interfaces" << std::endl;
-	    fpchassis.close();
 	    auto it = interfaces.find("xyz.openbmc_project.Sensor.Value");
 	    if (it != interfaces.end())
 	      {
@@ -103,22 +88,16 @@ handle_amiSnmpInteger(netsnmp_mib_handler *handler,
 		    std::get<double>(propIt->second))
 		  {
 		    amiInt = trunc(std::get<double>(propIt->second));
-		    fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-		    fpchassis << "path " << path.str << std::endl;
-		    fpchassis << "propIt second  " << std::get<double>(propIt->second) << std::endl;
-		    fpchassis.close();
 		    break;
 		  }
 	      }
 	  }	
 	
       }
-    catch (const std::bad_variant_access& e)
-      {
-	fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-	fpchassis << "failure" << std::endl;
-	fpchassis.close();
-      }
+    catch (const std::bad_variant_access& e)      
+    {
+            snmp_log(LOG_ERR, "unknown mode (%d) in handle_amiSnmpInteger\n %d %d", reqinfo->mode , reginfo->modes ,handler->flags);
+    }
         
     /* We are never called for a GETNEXT if it's registered as a
        "instance", as it's "magically" handled for us.  */
@@ -132,9 +111,6 @@ handle_amiSnmpInteger(netsnmp_mib_handler *handler,
             snmp_set_var_typed_value(requests->requestvb, ASN_INTEGER,
                                      /* XXX: a pointer to the scalar's data */&amiInt,
                                      /* XXX: the length of the data in bytes */sizeof(amiInt));
-	    fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-	    fpchassis << "Handle ami snmp integer MODE GET " << std::endl;
-	    fpchassis.close();
             break;
 
         /*
@@ -146,11 +122,6 @@ handle_amiSnmpInteger(netsnmp_mib_handler *handler,
         case MODE_SET_RESERVE1:
                 /* or you could use netsnmp_check_vb_type_and_size instead */
             ret = netsnmp_check_vb_type(requests->requestvb, ASN_INTEGER);
-	    
-	    fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-	    fpchassis << "Handle ami snmp integer MODE SET RESERVE1 " << std::endl;
-	    fpchassis.close();
-	    
             if ( ret != SNMP_ERR_NOERROR ) {
                 netsnmp_set_request_error(reqinfo, requests, ret );
             }
@@ -158,10 +129,6 @@ handle_amiSnmpInteger(netsnmp_mib_handler *handler,
 
         case MODE_SET_RESERVE2:
             /* XXX malloc "undo" storage buffer */
-
-	    fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-	    fpchassis << "Handle ami snmp integer MODE SET RESERVE2 " << std::endl;
-	    fpchassis.close();
 	  
             if (/* XXX if malloc, or whatever, failed: */0) {
                 netsnmp_set_request_error(reqinfo, requests, SNMP_ERR_RESOURCEUNAVAILABLE);
@@ -172,46 +139,27 @@ handle_amiSnmpInteger(netsnmp_mib_handler *handler,
             /* XXX: free resources allocated in RESERVE1 and/or
                RESERVE2.  Something failed somewhere, and the states
                below won't be called. */
-	    fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-	    fpchassis << "Handle ami snmp integer MODE SET FREE " << std::endl;
-	    fpchassis.close();
             break;
 
         case MODE_SET_ACTION:
             /* XXX: perform the value change here */
 	    //amiSnmpInteger(amiInt);
-	    fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-	    fpchassis << "Handle ami snmp integer MODE SET ACTION " << std::endl;
-	    fpchassis.close();
-	    
             break;
 
         case MODE_SET_COMMIT:
             /* XXX: delete temporary storage */
-	    fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-	    fpchassis << "Handle ami snmp integer MODE SET COMMIT" << std::endl;
-	    fpchassis.close();
             break;
 
         case MODE_SET_UNDO:
             /* XXX: UNDO and return to previous value for the object */
-	  	    fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-	    fpchassis << "Handle ami snmp integer MODE SET UNDO " << std::endl;
-	    fpchassis.close();
             break;
 
         default:
             /* we should never get here, so this is a really bad error */
-	    fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-	    fpchassis << "Handle ami snmp integer DEFAULT " << std::endl;
-	    fpchassis.close();
-            snmp_log(LOG_ERR, "unknown mode (%d) in handle_amiSnmpInteger\n", reqinfo->mode );
+            snmp_log(LOG_ERR, "unknown mode (%d) in handle_amiSnmpInteger %d %d\n", reqinfo->mode , reginfo->modes ,handler->flags);
             return SNMP_ERR_GENERR;
     }
 
-    fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-    fpchassis << "Handle ami snmp integer Return " << std::endl;
-    fpchassis.close();
     
     return SNMP_ERR_NOERROR;
 }
@@ -232,11 +180,6 @@ handle_amiSnmpSleeper(netsnmp_mib_handler *handler,
     
     double amiSleeperDble = getSensorInfo(basePath,interface);
 
-    if(0)
-      {
-	reginfo = reginfo;
-	handler = handler;
-      }
     amiSleeper = trunc(amiSleeperDble);
     
     /* We are never called for a GETNEXT if it's registered as a
@@ -291,7 +234,7 @@ handle_amiSnmpSleeper(netsnmp_mib_handler *handler,
 
         default:
             /* we should never get here, so this is a really bad error */
-            snmp_log(LOG_ERR, "unknown mode (%d) in handle_amiSnmpSleeper\n", reqinfo->mode );
+            snmp_log(LOG_ERR, "unknown mode (%d) in handle_amiSnmpSleeper %d %d \n", reqinfo->mode ,reginfo->modes ,handler->flags);
             return SNMP_ERR_GENERR;
     }
 
@@ -306,12 +249,6 @@ handle_amiSnmpString(netsnmp_mib_handler *handler,
     int ret;
 
     std::string amiString;
-
-    if(0)
-      {
-	reginfo = reginfo;
-	handler = handler;
-      }
 
     /* We are never called for a GETNEXT if it's registered as a
        "instance", as it's "magically" handled for us.  */
@@ -365,7 +302,7 @@ handle_amiSnmpString(netsnmp_mib_handler *handler,
 
         default:
             /* we should never get here, so this is a really bad error */
-            snmp_log(LOG_ERR, "unknown mode (%d) in handle_amiSnmpString\n", reqinfo->mode );
+            snmp_log(LOG_ERR, "unknown mode (%d) in handle_amiSnmpString %d %d\n", reqinfo->mode ,reginfo->modes ,handler->flags);
             return SNMP_ERR_GENERR;
     }
 
@@ -384,12 +321,6 @@ handle_amiSnmpFloat(netsnmp_mib_handler *handler,
     std::string interface = "xyz.openbmc_project.Sensor.Value";
     
     float amiFloat = static_cast<float> (getSensorInfo(basePath,interface));
-
-    if(0)
-      {
-	reginfo = reginfo;
-	handler = handler;
-      }
 
     switch(reqinfo->mode) {
 
@@ -438,7 +369,7 @@ handle_amiSnmpFloat(netsnmp_mib_handler *handler,
 
         default:
             /* we should never get here, so this is a really bad error */
-            snmp_log(LOG_ERR, "unknown mode (%d) in handle_amiSnmpFloat\n", reqinfo->mode );
+            snmp_log(LOG_ERR, "unknown mode (%d) in handle_amiSnmpFloat %d %d \n", reqinfo->mode , reginfo->modes ,handler->flags);
             return SNMP_ERR_GENERR;
     }
 
@@ -522,11 +453,6 @@ ObjUsr getMapperObject(std::string basePath,std::string interface)
 {
     ObjUsr objects;
 
-    std::ofstream fpchassis;
-    fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-    fpchassis << "get mapper object basePath" << basePath << std::endl;
-    fpchassis.close();
-    
     try
     {
       std::string sensorMgrObjBasePath = "/xyz/openbmc_project/sensors";
@@ -563,83 +489,42 @@ std::string getServiceName(std::string path, std::string intf)
     static constexpr const char* objMapperInterface =
       "xyz.openbmc_project.ObjectMapper";
     
-
-    std::ofstream fpchassis;
-    fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-    fpchassis << "get service name Path " << path << std::endl;
-    fpchassis.close();
     
     //sdbusplus::bus_t bus{ipmid_get_sd_bus_connection()};
     auto bus = sdbusplus::bus::new_default();
 
-    fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-    fpchassis << "get service Create mapper call GetObject " << std::endl;
-    fpchassis.close();
-    
     auto mapperCall = bus.new_method_call(objMapperService, objMapperPath,
                                           objMapperInterface, "GetObject");
 
 
-    fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-    fpchassis << "get service Append mapper call with Path " << path << std::endl;
-    fpchassis << "get service Append mapper call with iface " << intf << std::endl;
-    fpchassis.close();
     
     mapperCall.append(path);
     mapperCall.append(std::vector<std::string>({intf}));
 
-
-    fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-    fpchassis << "get service bus call " << std::endl;
-    fpchassis.close();
-    
     auto mapperResponseMsg = bus.call(mapperCall);
     
     if (mapperResponseMsg.is_method_error())
     {
-        fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-	fpchassis << "get service error in mapper call " << std::endl;
-	fpchassis.close();
-        lg2::error("Error in mapper call");
+    lg2::error("Error in mapper call");
 	phosphor::logging::elog<sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure>();
     }
     
-
-    fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-    fpchassis << "get service read " << std::endl;
-    fpchassis.close();
-
     std::map<std::string, std::vector<std::string>> mapperResponse;
     mapperResponseMsg.read(mapperResponse);
     
     
     if (mapperResponse.begin() == mapperResponse.end())
     {
-        fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-	fpchassis << "get service invalid response from mapper " << std::endl;
-	fpchassis.close();
-        lg2::error("Invalid response from mapper");
+    lg2::error("Invalid response from mapper");
 	phosphor::logging::elog<sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure>();
     }
-
-
-    fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-    fpchassis << "get service return " << std::endl;
-    fpchassis.close();
-    
     return mapperResponse.begin()->first;
 }
 
 double getSensorInfo(std::string basePath, std::string interface)
 {
-    std::ofstream fpchassis;
     ObjUsr objects;
     double sensorInfo = 0;
-
-    fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-    fpchassis << "handle SNMP Integer "  << std::endl;
-    fpchassis.close();
-
 
     objects = getMapperObject(basePath,interface);
 
@@ -648,10 +533,6 @@ double getSensorInfo(std::string basePath, std::string interface)
       {
         for (const auto& [path, interfaces] : objects)
           {
-            fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-            fpchassis << "find interfaces" << std::endl;
-            fpchassis.close();
-            //auto it = interfaces.find("xyz.openbmc_project.Sensor.Value");
 	    if(path == basePath)
 	      {
 		auto it = interfaces.find(interface);
@@ -661,11 +542,6 @@ double getSensorInfo(std::string basePath, std::string interface)
 		    if (propIt != it->second.end() && std::get<double>(propIt->second))
 		      {
 			sensorInfo = std::get<double>(propIt->second);
-			fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-			fpchassis << "path " << path.str << std::endl;
-			fpchassis << "propIt second  " << std::get<double>(propIt->second) << std::endl;
-			fpchassis.close();
-			//break;
 		      }// propIt second
 		  }//interface
 	      }//path 
@@ -674,9 +550,7 @@ double getSensorInfo(std::string basePath, std::string interface)
       }
     catch (const std::bad_variant_access& e)
       {
-        fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-        fpchassis << "failure" << std::endl;
-        fpchassis.close();
+        snmp_log(LOG_ERR, "failure");
       }
     return sensorInfo;
 }

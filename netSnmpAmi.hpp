@@ -21,7 +21,6 @@
 
 #ifndef NETSNMPAMI_H
 #define NETSNMPAMI_H
-const std::string tempChassisFilepath = "/tmp/chassis.tmp";
 
 void init_netSnmpAMIScalars(void);
 

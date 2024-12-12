@@ -63,12 +63,6 @@ initialize_table_netSnmpHostsTable(void)
 
     //DEBUGMSGTL(("netSnmpHostsTable:init", "initializing table netSnmpHostsTable\n"));
 
-
-    std::ofstream fpchassis;
-    fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-    fpchassis << "netSnmpHostsTable:init = initializing table netSnmpHostsTable " << std::endl;
-    fpchassis.close();
-    
     reg = netsnmp_create_handler_registration("netSnmpHostsTable",
 					      netSnmpHostsTable_handler,
 					      netSnmpHostsTable_oid,
@@ -141,36 +135,16 @@ netSnmpHostsTable_createEntry(netsnmp_tdata *table_data
     netsnmp_tdata_row *row;
 
 
-    std::ofstream fpchassis;
     size_t i;
-    /*
-    std::string basePath = "/xyz/openbmc_project/sensors/temperature/";
-    std::string amiSubStr;
-
-    amiSubStr = amiSensorName.substr(basePath.size());
-    fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-    fpchassis << "Create Entry " << amiSensorName << std::endl;
-    fpchassis << "SubString " << amiSubStr << std::endl;
-    fpchassis.close();
-
-    std::string interface = "xyz.openbmc_project.Sensor.Value";
-    amiSensorValue = getSensorInfo(amiSensorName,interface);
-    */
     
     entry = SNMP_MALLOC_TYPEDEF(struct netSnmpHostsTable_entry);
     if (!entry)
       {
-	fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-	fpchassis << "No Entry" << std::endl;
-	fpchassis.close();
         return NULL;
       }
     row = netsnmp_tdata_create_row();
     if (!row)
       {
-	fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-	fpchassis << "Failed to create Row " << std::endl;
-	fpchassis.close();
 	SNMP_FREE(entry);
         return NULL;
       }
@@ -225,12 +199,6 @@ netSnmpHostsTable_removeEntry(netsnmp_tdata     *table_data,
                  netsnmp_tdata_row *row) {
     struct netSnmpHostsTable_entry *entry;
 
-    std::ofstream fpchassis;
-    fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-    fpchassis << "remove Entry " << std::endl;
-    fpchassis.close();
-    
-    
     if (!row)
         return;    /* Nothing to remove */
 
@@ -261,19 +229,7 @@ netSnmpHostsTable_handler(
     struct netSnmpHostsTable_entry          *table_entry;
     int                         ret;
 
-    DEBUGMSGTL(("netSnmpHostsTable:handler", "Processing request (%d)\n", reqinfo->mode));
-
-
-    std::ofstream fpchassis;
-    fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-    fpchassis << "Table handler " << std::endl;
-    fpchassis.close();
-
-    if(0)
-      {
-	handler = handler;
-	reginfo = reginfo;
-      }
+    DEBUGMSGTL(("netSnmpHostsTable:handler", "Processing request (%d) (%d) (%d)\n", reqinfo->mode,reginfo->modes,handler->flags));
     
     switch (reqinfo->mode) {
         /*
@@ -615,18 +571,9 @@ void
 setup_sensorTable(netsnmp_tdata *table_data)
 {
 
-  //std::string amiString;
   uint8_t amiRowIndex[2];
   size_t amiRowIndex_len;
-
-  //std::vector<sensorData> amiSensorData;
   struct sensorData amiTest;
-  
-  
-  std::ofstream fpchassis;
-  fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-  fpchassis << "setup sensor table " << std::endl;
-  fpchassis.close();
   
   amiRowIndex[0] = 1;
   amiRowIndex[1] = 1;
@@ -634,36 +581,17 @@ setup_sensorTable(netsnmp_tdata *table_data)
   
   amiTest.sensorValue = 0.0;
   amiTest.sensorName = "Temp";
-  //amiSensorData.push_back(amiTest);
 
-  //ObjUsr objects;
-  //double amiDbl;
-  //std::string tempPath = "/xyz/openbmc_project/sensors/temperature/";
-  //std::string basePath = "/xyz/openbmc_project/sensors/temperature/Inlet_BRD_Temp";
   std::string iface = "xyz.openbmc_project.Sensor.Value";
   std::vector<std::string> subPath;
   
-  fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-  fpchassis << "handle SNMP Integer "  << std::endl;
-  fpchassis.close();
-
   for(amiRowIndex[0]=1;amiRowIndex[0]<=sensorPaths.size();amiRowIndex[0]++)
-    {
-
-      fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-      fpchassis << "+++++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
-      fpchassis << "GET service for row  " << amiRowIndex[0]  << std::endl;
-      fpchassis << "GET service for SensorPath[" << (amiRowIndex[0]-1) << "] " << sensorPaths[amiRowIndex[0]-1]  << std::endl;
-      fpchassis.close();
-      
+    {      
       //subPath = getServicePath(tempPath,iface);
       subPath = getServicePath(sensorPaths[amiRowIndex[0]-1],iface);
 
       if(subPath.empty())
 	{
-	  fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-	  fpchassis << "No sensors for sensor Path " << sensorPaths[amiRowIndex[0]-1] << std::endl;
-	  fpchassis.close();
 	  continue;
 	}
       
@@ -672,77 +600,10 @@ setup_sensorTable(netsnmp_tdata *table_data)
 	  //double getSensorInfo(std::string basePath, std::string interface)
 	  amiTest.sensorName = subPath[i].substr(sensorPaths[amiRowIndex[0]-1].size());
 	  amiTest.sensorValue = getSensorInfo( subPath[i], iface);
-	  fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-	  //fpchassis << "service Path[" << i << "] " << subPath[i] << " = " << amiDbl  << std::endl;
-	  fpchassis << "service Path[" << i << "] " << subPath[i] << " = " << amiTest.sensorValue  << std::endl;
-	  fpchassis.close();
 	  netSnmpHostsTable_createEntry(table_data,amiRowIndex,amiRowIndex_len,amiTest.sensorName,amiTest.sensorValue);
 	  amiRowIndex[1]=i+1;
 	}
     }
-      /*
-      objects.clear();
-      //objects = getMapperObject(basePath,iface);
-      objects = getMapperObject(subPath[0],iface);
-      
-      //get the sensor Information
-      try
-	{
-	  for (const auto& [path, interfaces] : objects)
-	    {
-	      fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-	      fpchassis << "find iface in path " << path.str << std::endl;
-	      //fpchassis << "iface " << interfaces << std::endl;
-	      fpchassis.close();
-	      auto it = interfaces.find(iface);
-	      if (it != interfaces.end())
-		{
-		  auto propIt = it->second.find("Value");
-		  if (propIt != it->second.end() && std::get<double>(propIt->second))
-		    {
-		      amiTest.sensorName = path.str.substr(sensorPaths[amiRowIndex[0]-1].size());
-		      amiTest.sensorValue = std::get<double>(propIt->second);
-		      fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-		      //fpchassis << "path " << path.str << std::endl;
-		      fpchassis << "amiSensorName " << amiTest.sensorName << std::endl;
-		      fpchassis << "amiSensorValue " << amiTest.sensorValue << std::endl;
-		      fpchassis << "propIt second  " << std::get<double>(propIt->second) << std::endl;
-		      fpchassis.close();
-		      amiSensorData.push_back(amiTest);
-		    }// propIt second
-		  else
-		    {
-		      fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-		      fpchassis << "failed to find Value" << std::endl;
-		      fpchassis.close();
-		    }
-		}//interface
-	      else
-		{
-		  fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-		  fpchassis << "failed to find interfaces" << std::endl;
-		  fpchassis.close();
-		}
-	    }// for loop
-	  
-	}
-      catch (const std::bad_variant_access& e)
-	{
-	  fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-	  fpchassis << "failure" << std::endl;
-	  fpchassis.close();
-	}
-      
-      for(auto element : amiSensorData)
-	{
-	  netSnmpHostsTable_createEntry(table_data,amiRowIndex,amiRowIndex_len,element.sensorName,element.sensorValue);
-	  //netSnmpHostsTable_createEntry(table_data,amiRowIndex,amiRowIndex_len,amiTest.sensorName,amiTest.sensorValue);
-	  //netSnmpHostsTable_createEntry(table_data,amiRowIndex,amiRowIndex_len,amiSensorData[0].sensorName,amiSensorData[0].sensorValue);
-	  //netSnmpHostsTable_createEntry(table_data,amiString.data(),amiStringLen);
-	  amiRowIndex[1]++;
-	}
-    } 
-      */
   return;
 }
 
@@ -758,25 +619,12 @@ std::vector<std::string> getServicePath(std::string_view path, std::string& intf
       "xyz.openbmc_project.ObjectMapper";
     auto depth = 0;
 
-    std::ofstream fpchassis;
-    fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-    fpchassis << "get service Path " << std::endl;
-    fpchassis.close();
-
     //sdbusplus::bus_t bus{ipmid_get_sd_bus_connection()};
     auto bus = sdbusplus::bus::new_default();
-
-    fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-    fpchassis << "get service Create mapper call " << std::endl;
-    fpchassis.close();
-
     auto mapperCall = bus.new_method_call(objMapperService, objMapperPath,
                                           objMapperInterface, "GetSubTreePaths");
 
 
-    fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-    fpchassis << "get servicePath Append mapper call " << std::endl;
-    fpchassis.close();
 
     //setup dbus call
     mapperCall.append(path);
@@ -787,73 +635,28 @@ std::vector<std::string> getServicePath(std::string_view path, std::string& intf
     
     try
       {
-	fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-	fpchassis << "get service Path bus call " << std::endl;
-	fpchassis.close();
 	auto mapperResponseMsg = bus.call(mapperCall);
 
 	//errors
 	if (mapperResponseMsg.is_method_error())
 	  {
-	    fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-	    fpchassis << "get service Path error in mapper call " << std::endl;
-	    fpchassis.close();
 	    lg2::error("Error in mapper call");
 	    phosphor::logging::elog<sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure>();
 	  }
 	
 	
-	fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-	fpchassis << "get service Path read " << std::endl;
-	fpchassis.close();
 	
-	//response
-	//std::map<std::string, std::vector<std::string>> mapperResponse;
-	//std::vector<std::string> mapperResponse;
 	mapperResponseMsg.read(mapperResponse);
       }
     catch (const sdbusplus::exception::SdBusError& e)
       {
-	fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-	fpchassis << "Failed" << std::endl;
-	fpchassis.close();
 	return std::vector<std::string>({});
       }
-    /*
-    //errors
-    if (mapperResponseMsg.is_method_error())
-    {
-        fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-        fpchassis << "get service Path error in mapper call " << std::endl;
-        fpchassis.close();
-        lg2::error("Error in mapper call");
-        phosphor::logging::elog<sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure>();
-    }
-
-
-    fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-    fpchassis << "get service Path read " << std::endl;
-    fpchassis.close();
-
-    //response
-    //std::map<std::string, std::vector<std::string>> mapperResponse;
-    std::vector<std::string> mapperResponse;
-    mapperResponseMsg.read(mapperResponse);
-    */
-
     if (mapperResponse.size() == 0)
     {
-        fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-        fpchassis << "get service Path invalid response from mapper " << std::endl;
-        fpchassis.close();
         lg2::error("Invalid response from mapper");
         phosphor::logging::elog<sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure>();
     }
-
-
-    fpchassis.open("/tmp/chassis.tmp",std::ios_base::app);
-    fpchassis << "get service path return " << std::endl;
-    fpchassis.close();
 
     return mapperResponse;
 }
