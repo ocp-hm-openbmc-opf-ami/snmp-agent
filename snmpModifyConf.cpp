@@ -212,7 +212,8 @@ bool addCommunityString(const std::string &accessType,
 
   if (!isStringVectorString(ViewAccess, viewAccess) ||
       (isStringVectorString(CommunityString, communityString)) ||
-      (communityString == "public")) {
+      (boost::iequals(communityString.c_str(), "PUBLIC")) ||
+      (boost::iequals(communityString.c_str(), "PRIVATE"))) {
     std::cerr << "Invalid parameter.\n";
     return false;
   }

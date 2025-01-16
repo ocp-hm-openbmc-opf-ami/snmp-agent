@@ -1,6 +1,7 @@
 #pragma once
 
 #include <sdbusplus/asio/object_server.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 #include <string>
 
 extern const std::string snmpConfFilepath;
