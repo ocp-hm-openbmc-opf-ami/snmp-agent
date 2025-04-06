@@ -1,0 +1,64 @@
+#pragma once
+
+#include "snmp_agent_client.hpp"
+#include "snmp_user_create.hpp"
+#include "snmp_user_manager.hpp"
+
+#include <filesystem>
+
+namespace phosphor
+{
+namespace snmp
+{
+namespace communityStr
+{
+
+constexpr auto SEPARATOR = "_";
+
+namespace fs = std::filesystem;
+
+/** @brief Serialize and persist SNMP manager/client D-Bus object.
+ *  @param[in] id - filename of the persisted SNMP manager object.
+ *  @param[in] manager - const reference to snmp client/manager object.
+ *  @param[in] path -  path of persistent location where D-Bus object would be
+ * saved.
+ *  @return fs::path - pathname of persisted snmp manager/client file.
+ */
+fs::path serialize(const std::string communityName, const CommunityStrManager& manager,
+                   const fs::path& path);
+
+/** @brief Deserialze SNMP manager/client info into a D-Bus object
+ *  @param[in] path - pathname of persisted manager/client file.
+ *  @param[in] manager - reference to snmp client/manager object
+ *                       which is the target of deserialization.
+ *  @return bool - true if the deserialization was successful, false otherwise.
+ */
+bool deserialize(const fs::path& path, CommunityStrManager& manager);
+} // namespace communityStr
+namespace user
+{
+
+constexpr auto SEPARATOR = "_";
+
+namespace fs = std::filesystem;
+
+/** @brief Serialize and persist SNMP manager/client D-Bus object.
+ *  @param[in] id - filename of the persisted SNMP manager object.
+ *  @param[in] manager - const reference to snmp client/manager object.
+ *  @param[in] path -  path of persistent location where D-Bus object would be
+ * saved.
+ *  @return fs::path - pathname of persisted snmp manager/client file.
+ */
+fs::path serialize(const std::string userName, const UserManager& manager, const fs::path& path);
+
+/** @brief Deserialze SNMP manager/client info into a D-Bus object
+ *  @param[in] path - pathname of persisted manager/client file.
+ *  @param[in] manager - reference to snmp client/manager object
+ *                       which is the target of deserialization.
+ *  @return bool - true if the deserialization was successful, false otherwise.
+ */
+bool deserialize(const fs::path& path, UserManager& manager);
+
+} // namespace user
+} // namespace snmp
+} // namespace phosphor
