@@ -5,24 +5,27 @@
 #ifndef NETSNMPAMIHANDLE_H
 #define NETSNMPAMIHANDLE_H
 
-#include "netSnmpExamples.hpp"
-
 #include <net-snmp/agent/cache_handler.h>
+#include <net-snmp/net-snmp-config.h>
+#include <net-snmp/net-snmp-includes.h>
 #include <net-snmp/agent/net-snmp-agent-includes.h>
 #include <net-snmp/agent/struct.h>
 #include <net-snmp/agent/table_data.h>
-#include <net-snmp/net-snmp-config.h>
-#include <net-snmp/net-snmp-includes.h>
+#include "netSnmpExamples.hpp"
+
+#include <string>
+#include <fstream>
+
 
 #include <boost/system/error_code.hpp> // IWYU pragma: keep
 #include <sdbusplus/asio/property.hpp>
 #include <sdbusplus/message/native_types.hpp>
 
+
 #include <array>
 #include <cstddef>
 #include <cstdint>
 #include <filesystem>
-#include <fstream>
 #include <functional>
 #include <regex>
 #include <span>
@@ -36,62 +39,59 @@
 
 typedef unsigned short uint16_t;
 
-using dbusPropVariant =
-    std::variant<std::vector<std::string>, std::string, double, uint16_t, bool>;
+using dbusPropVariant = std::variant<std::vector<std::string>,std::string, double, uint16_t, bool>;
 
-dbusPropVariant
-    getDbusProperty(const std::string& service, const std::string& objPath,
-                    const std::string& interface, const std::string& property);
+dbusPropVariant getDbusProperty(const std::string& service,
+                            const std::string& objPath,
+                            const std::string& interface,
+                            const std::string& property);
 
 /* function declarations */
 void init_netSnmpAmiSensorTable(void);
 void init_netSnmpAmiDiscreteSensorTable(void);
-void initialize_amiHandlers(void);
 
 Netsnmp_Node_Handler handler_netSnmpAmiSensorTable;
 Netsnmp_First_Data_Point sensorTable_get_first_data_point;
-Netsnmp_Next_Data_Point sensorTable_get_next_data_point;
-NetsnmpCacheLoad sensorTable_load;
-NetsnmpCacheFree sensorTable_free;
+Netsnmp_Next_Data_Point  sensorTable_get_next_data_point;
+NetsnmpCacheLoad         sensorTable_load;
+NetsnmpCacheFree         sensorTable_free;
 
 Netsnmp_Node_Handler handler_netSnmpAmiDiscreteSensorTable;
 Netsnmp_First_Data_Point discreteSensorTable_get_first_data_point;
-Netsnmp_Next_Data_Point discreteSensorTable_get_next_data_point;
-NetsnmpCacheLoad discreteSensorTable_load;
-NetsnmpCacheFree discreteSensorTable_free;
+Netsnmp_Next_Data_Point  discreteSensorTable_get_next_data_point;
+NetsnmpCacheLoad         discreteSensorTable_load;
+NetsnmpCacheFree         discreteSensorTable_free;
 
-#define REFRESH_RATE 10
+#define REFRESH_RATE            10
 
 /* column number definitions for table netSnmpAmiSensorTable */
-#define COLUMN_SENSORINDEX 1
-#define COLUMN_SENSORNAME 2
-#define COLUMN_SENSORVALUE 4
+#define COLUMN_SENSORINDEX         1
+#define COLUMN_SENSORNAME          2
+#define COLUMN_SENSORVALUE         4
 
-#define DISPLAY_STRING_SIZE 64
+#define DISPLAY_STRING_SIZE     64
 
-struct amiHandleSensorTable_entry
-{
-    long sensorIndex;
-    char sensorName[DISPLAY_STRING_SIZE];
-    double sensorValue;
-    struct amiHandleSensorTable_entry* next;
+struct amiHandleSensorTable_entry {
+    long            sensorIndex;
+    char            sensorName[DISPLAY_STRING_SIZE];
+    double          sensorValue;
+    struct amiHandleSensorTable_entry *next;
 };
 
-struct amiHandleDiscreteSensorTable_entry
-{
-    long sensorIndex;
-    char sensorName[DISPLAY_STRING_SIZE];
-    uint16_t sensorValue;
-    struct amiHandleDiscreteSensorTable_entry* next;
+struct amiHandleDiscreteSensorTable_entry {
+    long            sensorIndex;
+    char            sensorName[DISPLAY_STRING_SIZE];
+    uint16_t        sensorValue;
+    struct amiHandleDiscreteSensorTable_entry *next;
 };
 
 void init_netSnmpAmiUserInfoTable(void);
 
 Netsnmp_Node_Handler handler_netSnmpAmiUserInfoTable;
 Netsnmp_First_Data_Point userInfoTable_get_first_data_point;
-Netsnmp_Next_Data_Point userInfoTable_get_next_data_point;
-NetsnmpCacheLoad userInfoSensorTable_load;
-NetsnmpCacheFree userInfoSensorTable_free;
+Netsnmp_Next_Data_Point  userInfoTable_get_next_data_point;
+NetsnmpCacheLoad         userInfoSensorTable_load;
+NetsnmpCacheFree         userInfoSensorTable_free;
 
 #define COLUMN_USERINDEX 1
 #define COLUMN_USERINFO 2
@@ -99,11 +99,13 @@ NetsnmpCacheFree userInfoSensorTable_free;
 #define USERGROUPSLEN 256
 #define USERNAMELEN 24
 
-struct amiHandleUserInfoTable_entry
-{
-    long userIndex;
-    char userInfo[USERINFOLEN];
-    struct amiHandleUserInfoTable_entry* next;
+struct amiHandleUserInfoTable_entry {
+    long          userIndex;
+    char          userInfo[USERINFOLEN];
+    struct amiHandleUserInfoTable_entry *next;
 };
 
+
 #endif /* NETSNMPAMIHANDLE_H */
+
+

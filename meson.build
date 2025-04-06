@@ -11,28 +11,7 @@ project('snmp-agent',
 )
 
 conf_data = configuration_data()
-conf_data.set_quoted('BUSNAME_NETWORK_SNMP', 'xyz.openbmc_project.Snmp.Conf')
-conf_data.set_quoted(
-    'OBJ_NETWORK_SNMP',
-    '/xyz/openbmc_project/snmp/CommunityStrManager',
-)
-conf_data.set_quoted(
-    'OBJ_NETWORK_SNMP_USER',
-    '/xyz/openbmc_project/snmp/UserManager',
-)
-conf_data.set_quoted(
-    'OBJ_NETWORK_SNMP_UTILS',
-    '/xyz/openbmc_project/snmp/SnmpUtils',
-)
-conf_data.set_quoted(
-    'SNMP_CONF_PERSIST_PATH',
-    '/var/lib/snmp-agent/managers/',
-)
-conf_data.set_quoted(
-    'SNMP_USER_CONF_PERSIST_PATH',
-    '/var/lib/snmp-agent/userManagers/',
-)
-conf_data.set('CLASS_VERSION', 1)
+
 
 conf_header = configure_file(output: 'config.h',
     configuration: conf_data)
@@ -63,31 +42,19 @@ snmp_agent_dep = [
 ]
 
 snmp_agent_src = [
-     'snmp_agent_main.cpp',
-     'snmp_conf_manager.cpp',
-     'snmp_conf_manager.hpp',
-     'snmp_agent_client.cpp',
-     'snmp_agent_client.hpp',
-     'snmp_agent_serialize.cpp',
-     'snmp_agent_serialize.hpp',
-     'snmp_user_manager.cpp',
-     'snmp_user_manager.hpp',
-     'snmp_user_create.cpp',
-     'snmp_user_create.hpp',
-     'snmpModifyConf.hpp',
-     'snmpModifyConf.cpp',
-     'snmpUtils.hpp',
-     'snmpUtils.cpp',
-     'snmp_agent_util.hpp',
-     'snmp_agent_util.cpp',
-     'netSnmpAmiHandle.cpp',
-     'netSnmpAmiHandle.hpp',
+     'snmpAgent.cpp',
+     'snmpAgent.hpp',
      'netSnmpExamples.cpp',
      'netSnmpExamples.hpp',
+     'netSnmpHostsTable.cpp',
+     'netSnmpHostsTable.hpp',
      'netSnmpAmi.cpp',
      'netSnmpAmi.hpp',
-     'netSnmpHostsTable.hpp',
-     'netSnmpHostsTable.cpp'
+     'snmpModifyConf.cpp',
+     'snmpModifyConf.hpp',
+     'snmpUtils.hpp',
+     'netSnmpAmiHandle.hpp',
+     'netSnmpAmiHandle.cpp'
 ]
 
 executable(
@@ -100,6 +67,5 @@ executable(
     cpp_args: ['-DBOOST_ALL_NO_LIB', '-DBOOST_SYSTEM_NO_DEPRECATED', '-DBOOST_ERROR_CODE_HEADER_ONLY'],
     install: true,
 )
-
 
 
