@@ -3,114 +3,100 @@
  * using mib2c.scalar.conf
  */
 
+#include "netSnmpExamples.hpp"
+
+#include <net-snmp/agent/net-snmp-agent-includes.h>
 #include <net-snmp/net-snmp-config.h>
 #include <net-snmp/net-snmp-includes.h>
-#include <net-snmp/agent/net-snmp-agent-includes.h>
-#include "netSnmpExamples.hpp"
 
 #include <phosphor-logging/elog-errors.hpp>
 #include <phosphor-logging/elog.hpp>
 #include <phosphor-logging/lg2.hpp>
-
-
 #include <sdbusplus/message/types.hpp>
 #include <xyz/openbmc_project/Common/error.hpp>
 #include <xyz/openbmc_project/Sensor/Value/server.hpp>
 
-
 /** Initializes the netSnmpExampleScalars module */
-void
-init_netSnmpExampleScalars(void)
+void init_netSnmpExampleScalars(void)
 {
-    const oid amiSnmpInteger_oid[] = { 1,3,6,1,4,1,8072,2,1,1 };
-    const oid amiSnmpSleeper_oid[] = { 1,3,6,1,4,1,8072,2,1,2 };
-    const oid amiSnmpString_oid[] = { 1,3,6,1,4,1,8072,2,1,3 };
-    const oid amiSnmpFloat_oid[] = { 1,3,6,1,4,1,8072,2,1,4 };
-    const oid amiSnmpInlet_BRD_Temp_oid[] = { 1,3,6,1,4,1,8072,2,1,5 };
+    const oid amiSnmpInteger_oid[] = {1, 3, 6, 1, 4, 1, 8072, 2, 1, 1};
+    const oid amiSnmpSleeper_oid[] = {1, 3, 6, 1, 4, 1, 8072, 2, 1, 2};
+    const oid amiSnmpString_oid[] = {1, 3, 6, 1, 4, 1, 8072, 2, 1, 3};
+    const oid amiSnmpFloat_oid[] = {1, 3, 6, 1, 4, 1, 8072, 2, 1, 4};
+    const oid amiSnmpInlet_BRD_Temp_oid[] = {1, 3, 6, 1, 4, 1, 8072, 2, 1, 5};
 
-  DEBUGMSGTL(("netSnmpExampleScalars", "Initializing\n"));
+    DEBUGMSGTL(("netSnmpExampleScalars", "Initializing\n"));
 
-    netsnmp_register_scalar(
-        netsnmp_create_handler_registration("amiSnmpInteger", handle_amiSnmpInteger,
-                               amiSnmpInteger_oid, OID_LENGTH(amiSnmpInteger_oid),
-                               HANDLER_CAN_RWRITE
-        ));
-    netsnmp_register_scalar(
-        netsnmp_create_handler_registration("amiSnmpSleeper", handle_amiSnmpSleeper,
-                               amiSnmpSleeper_oid, OID_LENGTH(amiSnmpSleeper_oid),
-                               HANDLER_CAN_RWRITE
-        ));
-    netsnmp_register_scalar(
-        netsnmp_create_handler_registration("amiSnmpString", handle_amiSnmpString,
-                               amiSnmpString_oid, OID_LENGTH(amiSnmpString_oid),
-                               HANDLER_CAN_RWRITE
-        ));
+    netsnmp_register_scalar(netsnmp_create_handler_registration(
+        "amiSnmpInteger", handle_amiSnmpInteger, amiSnmpInteger_oid,
+        OID_LENGTH(amiSnmpInteger_oid), HANDLER_CAN_RWRITE));
+    netsnmp_register_scalar(netsnmp_create_handler_registration(
+        "amiSnmpSleeper", handle_amiSnmpSleeper, amiSnmpSleeper_oid,
+        OID_LENGTH(amiSnmpSleeper_oid), HANDLER_CAN_RWRITE));
+    netsnmp_register_scalar(netsnmp_create_handler_registration(
+        "amiSnmpString", handle_amiSnmpString, amiSnmpString_oid,
+        OID_LENGTH(amiSnmpString_oid), HANDLER_CAN_RWRITE));
 
-    netsnmp_register_scalar(
-        netsnmp_create_handler_registration("amiSnmpFloat", handle_amiSnmpFloat,
-                               amiSnmpFloat_oid, OID_LENGTH(amiSnmpFloat_oid),
-                               HANDLER_CAN_RWRITE
-        ));
-    netsnmp_register_scalar(
-        netsnmp_create_handler_registration("amiSnmpInlet_BRD_Temp", handle_amiSnmpInlet_BRD_Temp,
-                               amiSnmpInlet_BRD_Temp_oid, OID_LENGTH(amiSnmpInlet_BRD_Temp_oid),
-                               HANDLER_CAN_RWRITE
-        ));
-    
+    netsnmp_register_scalar(netsnmp_create_handler_registration(
+        "amiSnmpFloat", handle_amiSnmpFloat, amiSnmpFloat_oid,
+        OID_LENGTH(amiSnmpFloat_oid), HANDLER_CAN_RWRITE));
+    netsnmp_register_scalar(netsnmp_create_handler_registration(
+        "amiSnmpInlet_BRD_Temp", handle_amiSnmpInlet_BRD_Temp,
+        amiSnmpInlet_BRD_Temp_oid, OID_LENGTH(amiSnmpInlet_BRD_Temp_oid),
+        HANDLER_CAN_RWRITE));
 }
 
-int
-handle_amiSnmpInteger(netsnmp_mib_handler *handler,
-                          netsnmp_handler_registration *reginfo,
-                          netsnmp_agent_request_info   *reqinfo,
-                          netsnmp_request_info         *requests)
+int handle_amiSnmpInteger(netsnmp_mib_handler* handler,
+                          netsnmp_handler_registration* reginfo,
+                          netsnmp_agent_request_info* reqinfo,
+                          netsnmp_request_info* requests)
 {
     int ret;
-    int amiInt=0;
+    int amiInt = 0;
     ObjUsr objects;
-    
+
     std::string basePath = "/xyz/openbmc_project/sensors/temperature/BMC_Temp";
     std::string interface = "xyz.openbmc_project.Sensor.Value";
 
-    objects = getMapperObject(basePath,interface);
-	
-    
-    //get the sensor Information
+    objects = getMapperObject(basePath, interface);
+
+    // get the sensor Information
     try
-      {
-	for (const auto& [path, interfaces] : objects)
-	  {
-	    auto it = interfaces.find("xyz.openbmc_project.Sensor.Value");
-	    if (it != interfaces.end())
-	      {
-		auto propIt = it->second.find("Value");
-		if (propIt != it->second.end() &&
-		    std::get<double>(propIt->second))
-		  {
-		    amiInt = trunc(std::get<double>(propIt->second));
-		    break;
-		  }
-	      }
-	  }	
-	
-      }
-    catch (const std::bad_variant_access& e)      
     {
-            snmp_log(LOG_ERR, "unknown mode (%d) in handle_amiSnmpInteger\n %d %d", reqinfo->mode , reginfo->modes ,handler->flags);
+        for (const auto& [path, interfaces] : objects)
+        {
+            auto it = interfaces.find("xyz.openbmc_project.Sensor.Value");
+            if (it != interfaces.end())
+            {
+                auto propIt = it->second.find("Value");
+                if (propIt != it->second.end() &&
+                    std::get<double>(propIt->second))
+                {
+                    amiInt = trunc(std::get<double>(propIt->second));
+                    break;
+                }
+            }
+        }
     }
-        
+    catch (const std::bad_variant_access& e)
+    {
+        snmp_log(LOG_ERR, "unknown mode (%d) in handle_amiSnmpInteger\n %d %d",
+                 reqinfo->mode, reginfo->modes, handler->flags);
+    }
+
     /* We are never called for a GETNEXT if it's registered as a
        "instance", as it's "magically" handled for us.  */
 
     /* a instance handler also only hands us one request at a time, so
        we don't need to loop over a list of requests; we'll only get one. */
-    
-    switch(reqinfo->mode) {
 
+    switch (reqinfo->mode)
+    {
         case MODE_GET:
-            snmp_set_var_typed_value(requests->requestvb, ASN_INTEGER,
-                                     /* XXX: a pointer to the scalar's data */&amiInt,
-                                     /* XXX: the length of the data in bytes */sizeof(amiInt));
+            snmp_set_var_typed_value(
+                requests->requestvb, ASN_INTEGER,
+                /* XXX: a pointer to the scalar's data */ &amiInt,
+                /* XXX: the length of the data in bytes */ sizeof(amiInt));
             break;
 
         /*
@@ -120,18 +106,21 @@ handle_amiSnmpInteger(netsnmp_mib_handler *handler,
          * http://www.net-snmp.org/tutorial-5/toolkit/mib_module/set-actions.jpg
          */
         case MODE_SET_RESERVE1:
-                /* or you could use netsnmp_check_vb_type_and_size instead */
+            /* or you could use netsnmp_check_vb_type_and_size instead */
             ret = netsnmp_check_vb_type(requests->requestvb, ASN_INTEGER);
-            if ( ret != SNMP_ERR_NOERROR ) {
-                netsnmp_set_request_error(reqinfo, requests, ret );
+            if (ret != SNMP_ERR_NOERROR)
+            {
+                netsnmp_set_request_error(reqinfo, requests, ret);
             }
             break;
 
         case MODE_SET_RESERVE2:
             /* XXX malloc "undo" storage buffer */
-	  
-            if (/* XXX if malloc, or whatever, failed: */0) {
-                netsnmp_set_request_error(reqinfo, requests, SNMP_ERR_RESOURCEUNAVAILABLE);
+
+            if (/* XXX if malloc, or whatever, failed: */ 0)
+            {
+                netsnmp_set_request_error(reqinfo, requests,
+                                          SNMP_ERR_RESOURCEUNAVAILABLE);
             }
             break;
 
@@ -143,7 +132,7 @@ handle_amiSnmpInteger(netsnmp_mib_handler *handler,
 
         case MODE_SET_ACTION:
             /* XXX: perform the value change here */
-	    //amiSnmpInteger(amiInt);
+            // amiSnmpInteger(amiInt);
             break;
 
         case MODE_SET_COMMIT:
@@ -156,44 +145,44 @@ handle_amiSnmpInteger(netsnmp_mib_handler *handler,
 
         default:
             /* we should never get here, so this is a really bad error */
-            snmp_log(LOG_ERR, "unknown mode (%d) in handle_amiSnmpInteger %d %d\n", reqinfo->mode , reginfo->modes ,handler->flags);
+            snmp_log(LOG_ERR,
+                     "unknown mode (%d) in handle_amiSnmpInteger %d %d\n",
+                     reqinfo->mode, reginfo->modes, handler->flags);
             return SNMP_ERR_GENERR;
     }
 
-    
     return SNMP_ERR_NOERROR;
 }
 
-int
-handle_amiSnmpSleeper(netsnmp_mib_handler *handler,
-                          netsnmp_handler_registration *reginfo,
-                          netsnmp_agent_request_info   *reqinfo,
-                          netsnmp_request_info         *requests)
+int handle_amiSnmpSleeper(netsnmp_mib_handler* handler,
+                          netsnmp_handler_registration* reginfo,
+                          netsnmp_agent_request_info* reqinfo,
+                          netsnmp_request_info* requests)
 {
     int ret;
 
     int amiSleeper = 0;
 
-    
     std::string basePath = "/xyz/openbmc_project/sensors/temperature/BMC_Temp";
     std::string interface = "xyz.openbmc_project.Sensor.Value";
-    
-    double amiSleeperDble = getSensorInfo(basePath,interface);
+
+    double amiSleeperDble = getSensorInfo(basePath, interface);
 
     amiSleeper = trunc(amiSleeperDble);
-    
+
     /* We are never called for a GETNEXT if it's registered as a
        "instance", as it's "magically" handled for us.  */
 
     /* a instance handler also only hands us one request at a time, so
        we don't need to loop over a list of requests; we'll only get one. */
-    
-    switch(reqinfo->mode) {
 
+    switch (reqinfo->mode)
+    {
         case MODE_GET:
-            snmp_set_var_typed_value(requests->requestvb, ASN_INTEGER,
-                                     /* XXX: a pointer to the scalar's data */&amiSleeper,
-                                     /* XXX: the length of the data in bytes */sizeof(amiSleeper));
+            snmp_set_var_typed_value(
+                requests->requestvb, ASN_INTEGER,
+                /* XXX: a pointer to the scalar's data */ &amiSleeper,
+                /* XXX: the length of the data in bytes */ sizeof(amiSleeper));
             break;
 
         /*
@@ -203,10 +192,11 @@ handle_amiSnmpSleeper(netsnmp_mib_handler *handler,
          * http://www.net-snmp.org/tutorial-5/toolkit/mib_module/set-actions.jpg
          */
         case MODE_SET_RESERVE1:
-                /* or you could use netsnmp_check_vb_type_and_size instead */
+            /* or you could use netsnmp_check_vb_type_and_size instead */
             ret = netsnmp_check_vb_type(requests->requestvb, ASN_INTEGER);
-            if ( ret != SNMP_ERR_NOERROR ) {
-                netsnmp_set_request_error(reqinfo, requests, ret );
+            if (ret != SNMP_ERR_NOERROR)
+            {
+                netsnmp_set_request_error(reqinfo, requests, ret);
             }
             break;
 
@@ -234,17 +224,18 @@ handle_amiSnmpSleeper(netsnmp_mib_handler *handler,
 
         default:
             /* we should never get here, so this is a really bad error */
-            snmp_log(LOG_ERR, "unknown mode (%d) in handle_amiSnmpSleeper %d %d \n", reqinfo->mode ,reginfo->modes ,handler->flags);
+            snmp_log(LOG_ERR,
+                     "unknown mode (%d) in handle_amiSnmpSleeper %d %d \n",
+                     reqinfo->mode, reginfo->modes, handler->flags);
             return SNMP_ERR_GENERR;
     }
 
     return SNMP_ERR_NOERROR;
 }
-int
-handle_amiSnmpString(netsnmp_mib_handler *handler,
-                          netsnmp_handler_registration *reginfo,
-                          netsnmp_agent_request_info   *reqinfo,
-                          netsnmp_request_info         *requests)
+int handle_amiSnmpString(netsnmp_mib_handler* handler,
+                         netsnmp_handler_registration* reginfo,
+                         netsnmp_agent_request_info* reqinfo,
+                         netsnmp_request_info* requests)
 {
     int ret;
 
@@ -255,13 +246,14 @@ handle_amiSnmpString(netsnmp_mib_handler *handler,
 
     /* a instance handler also only hands us one request at a time, so
        we don't need to loop over a list of requests; we'll only get one. */
-    
-    switch(reqinfo->mode) {
 
+    switch (reqinfo->mode)
+    {
         case MODE_GET:
-            snmp_set_var_typed_value(requests->requestvb, ASN_OCTET_STR,
-                                     /* XXX: a pointer to the scalar's data */&amiString,
-                                     /* XXX: the length of the data in bytes */amiString.size());
+            snmp_set_var_typed_value(
+                requests->requestvb, ASN_OCTET_STR,
+                /* XXX: a pointer to the scalar's data */ &amiString,
+                /* XXX: the length of the data in bytes */ amiString.size());
             break;
 
         /*
@@ -271,10 +263,11 @@ handle_amiSnmpString(netsnmp_mib_handler *handler,
          * http://www.net-snmp.org/tutorial-5/toolkit/mib_module/set-actions.jpg
          */
         case MODE_SET_RESERVE1:
-                /* or you could use netsnmp_check_vb_type_and_size instead */
+            /* or you could use netsnmp_check_vb_type_and_size instead */
             ret = netsnmp_check_vb_type(requests->requestvb, ASN_OCTET_STR);
-            if ( ret != SNMP_ERR_NOERROR ) {
-                netsnmp_set_request_error(reqinfo, requests, ret );
+            if (ret != SNMP_ERR_NOERROR)
+            {
+                netsnmp_set_request_error(reqinfo, requests, ret);
             }
             break;
 
@@ -302,32 +295,34 @@ handle_amiSnmpString(netsnmp_mib_handler *handler,
 
         default:
             /* we should never get here, so this is a really bad error */
-            snmp_log(LOG_ERR, "unknown mode (%d) in handle_amiSnmpString %d %d\n", reqinfo->mode ,reginfo->modes ,handler->flags);
+            snmp_log(LOG_ERR,
+                     "unknown mode (%d) in handle_amiSnmpString %d %d\n",
+                     reqinfo->mode, reginfo->modes, handler->flags);
             return SNMP_ERR_GENERR;
     }
 
     return SNMP_ERR_NOERROR;
 }
 
-int
-handle_amiSnmpFloat(netsnmp_mib_handler *handler,
-                          netsnmp_handler_registration *reginfo,
-                          netsnmp_agent_request_info   *reqinfo,
-                          netsnmp_request_info         *requests)
+int handle_amiSnmpFloat(netsnmp_mib_handler* handler,
+                        netsnmp_handler_registration* reginfo,
+                        netsnmp_agent_request_info* reqinfo,
+                        netsnmp_request_info* requests)
 {
     int ret;
 
     std::string basePath = "/xyz/openbmc_project/sensors/temperature/BMC_Temp";
     std::string interface = "xyz.openbmc_project.Sensor.Value";
-    
-    float amiFloat = static_cast<float> (getSensorInfo(basePath,interface));
 
-    switch(reqinfo->mode) {
+    float amiFloat = static_cast<float>(getSensorInfo(basePath, interface));
 
+    switch (reqinfo->mode)
+    {
         case MODE_GET:
-            snmp_set_var_typed_value(requests->requestvb, ASN_OPAQUE_FLOAT,
-                                     /* XXX: a pointer to the scalar's data */&amiFloat,
-                                     /* XXX: the length of the data in bytes */sizeof(amiFloat));
+            snmp_set_var_typed_value(
+                requests->requestvb, ASN_OPAQUE_FLOAT,
+                /* XXX: a pointer to the scalar's data */ &amiFloat,
+                /* XXX: the length of the data in bytes */ sizeof(amiFloat));
             break;
 
         /*
@@ -337,12 +332,12 @@ handle_amiSnmpFloat(netsnmp_mib_handler *handler,
          * http://www.net-snmp.org/tutorial-5/toolkit/mib_module/set-actions.jpg
          */
         case MODE_SET_RESERVE1:
-                /* or you could use netsnmp_check_vb_type_and_size instead */
-	    ret = netsnmp_check_vb_type(requests->requestvb, ASN_OPAQUE_FLOAT);
-            if ( ret != SNMP_ERR_NOERROR )
-	      {
-                netsnmp_set_request_error(reqinfo, requests, ret );
-	      }
+            /* or you could use netsnmp_check_vb_type_and_size instead */
+            ret = netsnmp_check_vb_type(requests->requestvb, ASN_OPAQUE_FLOAT);
+            if (ret != SNMP_ERR_NOERROR)
+            {
+                netsnmp_set_request_error(reqinfo, requests, ret);
+            }
             break;
 
         case MODE_SET_RESERVE2:
@@ -369,38 +364,40 @@ handle_amiSnmpFloat(netsnmp_mib_handler *handler,
 
         default:
             /* we should never get here, so this is a really bad error */
-            snmp_log(LOG_ERR, "unknown mode (%d) in handle_amiSnmpFloat %d %d \n", reqinfo->mode , reginfo->modes ,handler->flags);
+            snmp_log(LOG_ERR,
+                     "unknown mode (%d) in handle_amiSnmpFloat %d %d \n",
+                     reqinfo->mode, reginfo->modes, handler->flags);
             return SNMP_ERR_GENERR;
     }
 
     return SNMP_ERR_NOERROR;
 }
 
-int
-handle_amiSnmpInlet_BRD_Temp(netsnmp_mib_handler *handler,
-                          netsnmp_handler_registration *reginfo,
-                          netsnmp_agent_request_info   *reqinfo,
-                          netsnmp_request_info         *requests)
+int handle_amiSnmpInlet_BRD_Temp(
+    netsnmp_mib_handler* handler, netsnmp_handler_registration* reginfo,
+    netsnmp_agent_request_info* reqinfo, netsnmp_request_info* requests)
 {
     int ret;
 
-    std::string basePath = "/xyz/openbmc_project/sensors/temperature/Inlet_BRD_Temp";
+    std::string basePath =
+        "/xyz/openbmc_project/sensors/temperature/Inlet_BRD_Temp";
     std::string interface = "xyz.openbmc_project.Sensor.Value";
-    
-    float amiFloat = static_cast<float> (getSensorInfo(basePath,interface));
 
-    if(0)
-      {
-	reginfo = reginfo;
-	handler = handler;
-      }
+    float amiFloat = static_cast<float>(getSensorInfo(basePath, interface));
 
-    switch(reqinfo->mode) {
+    if (0)
+    {
+        reginfo = reginfo;
+        handler = handler;
+    }
 
+    switch (reqinfo->mode)
+    {
         case MODE_GET:
-            snmp_set_var_typed_value(requests->requestvb, ASN_OPAQUE_FLOAT,
-                                     /* XXX: a pointer to the scalar's data */&amiFloat,
-                                     /* XXX: the length of the data in bytes */sizeof(amiFloat));
+            snmp_set_var_typed_value(
+                requests->requestvb, ASN_OPAQUE_FLOAT,
+                /* XXX: a pointer to the scalar's data */ &amiFloat,
+                /* XXX: the length of the data in bytes */ sizeof(amiFloat));
             break;
 
         /*
@@ -410,12 +407,12 @@ handle_amiSnmpInlet_BRD_Temp(netsnmp_mib_handler *handler,
          * http://www.net-snmp.org/tutorial-5/toolkit/mib_module/set-actions.jpg
          */
         case MODE_SET_RESERVE1:
-                /* or you could use netsnmp_check_vb_type_and_size instead */
-	    ret = netsnmp_check_vb_type(requests->requestvb, ASN_OPAQUE_FLOAT);
-            if ( ret != SNMP_ERR_NOERROR )
-	      {
-                netsnmp_set_request_error(reqinfo, requests, ret );
-	      }
+            /* or you could use netsnmp_check_vb_type_and_size instead */
+            ret = netsnmp_check_vb_type(requests->requestvb, ASN_OPAQUE_FLOAT);
+            if (ret != SNMP_ERR_NOERROR)
+            {
+                netsnmp_set_request_error(reqinfo, requests, ret);
+            }
             break;
 
         case MODE_SET_RESERVE2:
@@ -442,26 +439,27 @@ handle_amiSnmpInlet_BRD_Temp(netsnmp_mib_handler *handler,
 
         default:
             /* we should never get here, so this is a really bad error */
-            snmp_log(LOG_ERR, "unknown mode (%d) in handle_amiSnmpFloat\n", reqinfo->mode );
+            snmp_log(LOG_ERR, "unknown mode (%d) in handle_amiSnmpFloat\n",
+                     reqinfo->mode);
             return SNMP_ERR_GENERR;
     }
 
     return SNMP_ERR_NOERROR;
 }
 
-ObjUsr getMapperObject(std::string basePath,std::string interface)
+ObjUsr getMapperObject(std::string basePath, std::string interface)
 {
     ObjUsr objects;
 
     try
     {
-      std::string sensorMgrObjBasePath = "/xyz/openbmc_project/sensors";
-		
-	auto bus = sdbusplus::bus::new_default();
-		
-        auto sensorMgmtService = getServiceName(basePath,interface);
+        std::string sensorMgrObjBasePath = "/xyz/openbmc_project/sensors";
+
+        auto bus = sdbusplus::bus::new_default();
+
+        auto sensorMgmtService = getServiceName(basePath, interface);
         auto method = bus.new_method_call(
-	  sensorMgmtService.c_str(), sensorMgrObjBasePath.c_str(),
+            sensorMgmtService.c_str(), sensorMgrObjBasePath.c_str(),
             "org.freedesktop.DBus.ObjectManager", "GetManagedObjects");
 
         auto reply = bus.call(method);
@@ -469,54 +467,49 @@ ObjUsr getMapperObject(std::string basePath,std::string interface)
     }
     catch (const sdbusplus::exception_t& e)
     {
-        //lg2::error("Failed to excute GetManagedObjects at {PATH}: {ERR}",
-        //           "PATH", ldapMgrObjBasePath, "ERR", e);
+        // lg2::error("Failed to excute GetManagedObjects at {PATH}: {ERR}",
+        //            "PATH", ldapMgrObjBasePath, "ERR", e);
         throw;
     }
     return objects;
 }
 
-
 std::string getServiceName(std::string path, std::string intf)
 {
-
-
     // Object Mapper related
     static constexpr const char* objMapperService =
-      "xyz.openbmc_project.ObjectMapper";
+        "xyz.openbmc_project.ObjectMapper";
     static constexpr const char* objMapperPath =
-      "/xyz/openbmc_project/object_mapper";
+        "/xyz/openbmc_project/object_mapper";
     static constexpr const char* objMapperInterface =
-      "xyz.openbmc_project.ObjectMapper";
-    
-    
-    //sdbusplus::bus_t bus{ipmid_get_sd_bus_connection()};
+        "xyz.openbmc_project.ObjectMapper";
+
+    // sdbusplus::bus_t bus{ipmid_get_sd_bus_connection()};
     auto bus = sdbusplus::bus::new_default();
 
     auto mapperCall = bus.new_method_call(objMapperService, objMapperPath,
                                           objMapperInterface, "GetObject");
 
-
-    
     mapperCall.append(path);
     mapperCall.append(std::vector<std::string>({intf}));
 
     auto mapperResponseMsg = bus.call(mapperCall);
-    
+
     if (mapperResponseMsg.is_method_error())
     {
-    lg2::error("Error in mapper call");
-	phosphor::logging::elog<sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure>();
+        lg2::error("Error in mapper call");
+        phosphor::logging::elog<
+            sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure>();
     }
-    
+
     std::map<std::string, std::vector<std::string>> mapperResponse;
     mapperResponseMsg.read(mapperResponse);
-    
-    
+
     if (mapperResponse.begin() == mapperResponse.end())
     {
-    lg2::error("Invalid response from mapper");
-	phosphor::logging::elog<sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure>();
+        lg2::error("Invalid response from mapper");
+        phosphor::logging::elog<
+            sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure>();
     }
     return mapperResponse.begin()->first;
 }
@@ -526,31 +519,31 @@ double getSensorInfo(std::string basePath, std::string interface)
     ObjUsr objects;
     double sensorInfo = 0;
 
-    objects = getMapperObject(basePath,interface);
+    objects = getMapperObject(basePath, interface);
 
-    //get the sensor Information
+    // get the sensor Information
     try
-      {
+    {
         for (const auto& [path, interfaces] : objects)
-          {
-	    if(path == basePath)
-	      {
-		auto it = interfaces.find(interface);
-		if (it != interfaces.end())
-		  {		
-		    auto propIt = it->second.find("Value");
-		    if (propIt != it->second.end() && std::get<double>(propIt->second))
-		      {
-			sensorInfo = std::get<double>(propIt->second);
-		      }// propIt second
-		  }//interface
-	      }//path 
-	  }
-
-      }
+        {
+            if (path == basePath)
+            {
+                auto it = interfaces.find(interface);
+                if (it != interfaces.end())
+                {
+                    auto propIt = it->second.find("Value");
+                    if (propIt != it->second.end() &&
+                        std::get<double>(propIt->second))
+                    {
+                        sensorInfo = std::get<double>(propIt->second);
+                    } // propIt second
+                } // interface
+            } // path
+        }
+    }
     catch (const std::bad_variant_access& e)
-      {
+    {
         snmp_log(LOG_ERR, "failure");
-      }
+    }
     return sensorInfo;
 }
