@@ -64,14 +64,15 @@ void load(Archive& archive, CommunityStrManager& manager,
     manager.communityProfile(communityProfile);
 }
 
-fs::path serialize(const std::string communityName, const CommunityStrManager& manager,
-                   const fs::path& dir)
+fs::path serialize(const std::string communityName,
+                   const CommunityStrManager& manager, const fs::path& dir)
 {
     fs::path fileName = dir;
     fs::create_directories(dir);
     fileName /= communityName;
     std::ofstream os(fileName.string(), std::ios::binary);
-    if (!os.is_open()) {
+    if (!os.is_open())
+    {
         std::cerr << "Error: Could not open file " << fileName << std::endl;
         fileName = nullptr;
         return fileName;
@@ -88,7 +89,8 @@ bool deserialize(const fs::path& path, CommunityStrManager& manager)
         if (fs::exists(path))
         {
             std::ifstream is(path.c_str(), std::ios::in | std::ios::binary);
-            if (!is.is_open()) {
+            if (!is.is_open())
+            {
                 std::cerr << "Error: Could not open file " << path << std::endl;
                 return false;
             }
@@ -154,7 +156,8 @@ void load(Archive& archive, UserManager& manager,
     manager.readWritePermission(readWritePermission);
 }
 
-fs::path serialize(const std::string userName, const UserManager& manager, const fs::path& dir)
+fs::path serialize(const std::string userName, const UserManager& manager,
+                   const fs::path& dir)
 {
     fs::path fileName = dir;
     fs::create_directories(dir);

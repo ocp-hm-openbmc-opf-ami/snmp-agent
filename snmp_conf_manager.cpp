@@ -156,8 +156,9 @@ void ConfManager::restoreClients()
 
         std::string communityRef = confFile.path().filename().string();
         fs::path objPath = objectPath + "/" + communityRef;
-        auto manager = std::make_unique<phosphor::snmp::communityStr::CommunityStrManager>(
-            bus, objPath.string().c_str(), *this);
+        auto manager =
+            std::make_unique<phosphor::snmp::communityStr::CommunityStrManager>(
+                bus, objPath.string().c_str(), *this);
         if (deserialize(confFile.path(), *manager))
         {
             manager->emit_object_added();

@@ -29,8 +29,7 @@ UserManager::UserManager(
     const std::string userName, const std::string password,
     const std::string encryption, const std::string algorithm,
     const std::string readWritePermission) :
-    Ifaces(bus, objPath, Ifaces::action::defer_emit),
-    parent(parent)
+    Ifaces(bus, objPath, Ifaces::action::defer_emit), parent(parent)
 {
     this->userName(std::move(userName));
     this->password(std::move(password));

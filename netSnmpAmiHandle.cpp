@@ -91,9 +91,9 @@ std::string getSensorName(std::string Str)
     return sensorName;
 }
 
-dbusPropVariant
-    getDbusProperty(const std::string& service, const std::string& objPath,
-                    const std::string& interface, const std::string& property)
+dbusPropVariant getDbusProperty(
+    const std::string& service, const std::string& objPath,
+    const std::string& interface, const std::string& property)
 {
     dbusPropVariant Value;
     auto bus = sdbusplus::bus::new_default();

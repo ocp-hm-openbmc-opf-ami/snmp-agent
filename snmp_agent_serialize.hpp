@@ -24,8 +24,8 @@ namespace fs = std::filesystem;
  * saved.
  *  @return fs::path - pathname of persisted snmp manager/client file.
  */
-fs::path serialize(const std::string communityName, const CommunityStrManager& manager,
-                   const fs::path& path);
+fs::path serialize(const std::string communityName,
+                   const CommunityStrManager& manager, const fs::path& path);
 
 /** @brief Deserialze SNMP manager/client info into a D-Bus object
  *  @param[in] path - pathname of persisted manager/client file.
@@ -49,7 +49,8 @@ namespace fs = std::filesystem;
  * saved.
  *  @return fs::path - pathname of persisted snmp manager/client file.
  */
-fs::path serialize(const std::string userName, const UserManager& manager, const fs::path& path);
+fs::path serialize(const std::string userName, const UserManager& manager,
+                   const fs::path& path);
 
 /** @brief Deserialze SNMP manager/client info into a D-Bus object
  *  @param[in] path - pathname of persisted manager/client file.

@@ -156,7 +156,7 @@ void ConfManager::restoreClients()
         {
             continue;
         }
-        std::string userRef= confFile.path().filename().string();
+        std::string userRef = confFile.path().filename().string();
         fs::path objPath = objectPath + "/" + userRef;
         auto manager =
             std::make_unique<UserManager>(bus, objPath.string().c_str(), *this);

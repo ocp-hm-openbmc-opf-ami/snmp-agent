@@ -24,7 +24,7 @@ struct AddrDeleter
 {
     void operator()(addrinfo* addrPtr) const
     {
-        if(addrPtr != nullptr)
+        if (addrPtr != nullptr)
         {
             freeaddrinfo(addrPtr);
         }

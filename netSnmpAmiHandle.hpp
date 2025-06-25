@@ -39,9 +39,9 @@ typedef unsigned short uint16_t;
 using dbusPropVariant =
     std::variant<std::vector<std::string>, std::string, double, uint16_t, bool>;
 
-dbusPropVariant
-    getDbusProperty(const std::string& service, const std::string& objPath,
-                    const std::string& interface, const std::string& property);
+dbusPropVariant getDbusProperty(
+    const std::string& service, const std::string& objPath,
+    const std::string& interface, const std::string& property);
 
 /* function declarations */
 void init_netSnmpAmiSensorTable(void);

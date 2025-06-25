@@ -32,8 +32,7 @@ CommunityStrManager::CommunityStrManager(
     sdbusplus::bus_t& bus, const char* objPath, ConfManager& parent,
     const std::string& communityString, const std::string& readWritePermission,
     const std::string& communityProfile) :
-    Ifaces(bus, objPath, Ifaces::action::defer_emit),
-    parent(parent)
+    Ifaces(bus, objPath, Ifaces::action::defer_emit), parent(parent)
 {
     this->communityString(communityString);
     this->readWritePermission(readWritePermission);

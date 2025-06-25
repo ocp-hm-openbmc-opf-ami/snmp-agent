@@ -69,8 +69,7 @@ class UserManager : public Ifaces
      */
     UserManager(sdbusplus::bus_t& bus, const char* objPath,
                 ConfManager& parent) :
-        Ifaces(bus, objPath, Ifaces::action::defer_emit),
-        parent(parent)
+        Ifaces(bus, objPath, Ifaces::action::defer_emit), parent(parent)
     {}
 
     /** @brief Update the address of the object.

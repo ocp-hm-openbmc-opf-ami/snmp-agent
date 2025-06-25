@@ -1,5 +1,6 @@
 #include "snmp_agent_util.hpp"
 
+#include "netSnmpAmiHandle.hpp"
 #include "xyz/openbmc_project/Common/error.hpp"
 
 #include <arpa/inet.h>
@@ -8,7 +9,7 @@
 
 #include <phosphor-logging/elog-errors.hpp>
 #include <phosphor-logging/lg2.hpp>
-#include "netSnmpAmiHandle.hpp"
+
 #include <string>
 
 namespace phosphor
@@ -167,7 +168,7 @@ bool communityStringProfile(std::string value)
 bool userNameValidate(std::string value)
 {
     setpwent();
-    bool UsernameExists = false,enableStatus = false;
+    bool UsernameExists = false, enableStatus = false;
     struct passwd* pw;
     const char* userManagerService = "xyz.openbmc_project.User.Manager";
     const char* userAttributeInterface = "xyz.openbmc_project.User.Attributes";
@@ -175,9 +176,9 @@ bool userNameValidate(std::string value)
     constexpr const char* snmpEnableStatus = "SNMPAccessEnableStatus";
     std::string userObjPath = objpath + value;
 
-    enableStatus = std::get<bool> (getDbusProperty(userManagerService, userObjPath,
-                       userAttributeInterface,
-                       snmpEnableStatus));
+    enableStatus = std::get<bool>(
+        getDbusProperty(userManagerService, userObjPath, userAttributeInterface,
+                        snmpEnableStatus));
     while ((pw = getpwent()) != nullptr)
     {
         if (value == pw->pw_name)
@@ -187,7 +188,7 @@ bool userNameValidate(std::string value)
         }
     }
     endpwent();
-    if ( (!enableStatus) || value.empty() || !UsernameExists)
+    if ((!enableStatus) || value.empty() || !UsernameExists)
     {
         elog<InvalidArgument>(Argument::ARGUMENT_NAME("userName"),
                               Argument::ARGUMENT_VALUE(value.c_str()));
