@@ -5,27 +5,24 @@
 #ifndef NETSNMPHOSTSTABLE_H
 #define NETSNMPHOSTSTABLE_H
 
+#include "netSnmpExamples.hpp"
+
 #include <net-snmp/agent/cache_handler.h>
-#include <net-snmp/net-snmp-config.h>
-#include <net-snmp/net-snmp-includes.h>
 #include <net-snmp/agent/net-snmp-agent-includes.h>
 #include <net-snmp/agent/struct.h>
 #include <net-snmp/agent/table_data.h>
-#include "netSnmpExamples.hpp"
-
-#include <string>
-#include <fstream>
-
+#include <net-snmp/net-snmp-config.h>
+#include <net-snmp/net-snmp-includes.h>
 
 #include <boost/system/error_code.hpp> // IWYU pragma: keep
 #include <sdbusplus/asio/property.hpp>
 #include <sdbusplus/message/native_types.hpp>
 
-
 #include <array>
 #include <cstddef>
 #include <cstdint>
 #include <filesystem>
+#include <fstream>
 #include <functional>
 #include <regex>
 #include <span>
@@ -37,30 +34,28 @@
 #include <variant>
 #include <vector>
 
-
 /* function declarations */
 void init_netSnmpHostsTable(void);
 void initialize_table_netSnmpHostsTable(void);
-void setup_sensorTable(netsnmp_tdata *table_data);
+void setup_sensorTable(netsnmp_tdata* table_data);
 Netsnmp_Node_Handler netSnmpHostsTable_handler;
-std::vector<std::string> getServicePath(std::string_view path, std::string& intf);
+std::vector<std::string> getServicePath(std::string_view path,
+                                        std::string& intf);
 
 /* column number definitions for table netSnmpHostsTable */
-#define COLUMN_NETSNMPHOSTNAME		        1
-#define COLUMN_NETSNMPHOSTADDRESSTYPE		2
-#define COLUMN_NETSNMPHOSTADDRESS		3
-#define COLUMN_NETSNMPHOSTSTORAGE		4
-#define COLUMN_NETSNMPHOSTROWSTATUS		5
+#define COLUMN_NETSNMPHOSTNAME 1
+#define COLUMN_NETSNMPHOSTADDRESSTYPE 2
+#define COLUMN_NETSNMPHOSTADDRESS 3
+#define COLUMN_NETSNMPHOSTSTORAGE 4
+#define COLUMN_NETSNMPHOSTROWSTATUS 5
 #endif /* NETSNMPHOSTSTABLE_H */
 
-
-//using PropVariant = std::variant<std::string, float>;
+// using PropVariant = std::variant<std::string, float>;
 using PropVariant = std::variant<std::string, double>;
-using ObjProp = std::map<std::string,PropVariant>;
-using ObjValue = std::map<std::string,ObjProp >;
+using ObjProp = std::map<std::string, PropVariant>;
+using ObjValue = std::map<std::string, ObjProp>;
 using ObjUsr = std::map<sdbusplus::message::object_path, ObjValue>;
 
-//ObjUsr getMapperObject(std::string path, std::string interface);
-//std::string getServiceName(std::string&& path, std::string&& intf);
-//double getSensorInfo(std::string path, std::string interface);
-
+// ObjUsr getMapperObject(std::string path, std::string interface);
+// std::string getServiceName(std::string&& path, std::string&& intf);
+// double getSensorInfo(std::string path, std::string interface);

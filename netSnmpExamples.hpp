@@ -7,19 +7,15 @@
 #include <net-snmp/net-snmp-includes.h>
 #include <net-snmp/agent/net-snmp-agent-includes.h>
 
-#include <string>
-#include <fstream>
-
-
 #include <boost/system/error_code.hpp> // IWYU pragma: keep
 #include <sdbusplus/asio/property.hpp>
 #include <sdbusplus/message/native_types.hpp>
-
 
 #include <array>
 #include <cstddef>
 #include <cstdint>
 #include <filesystem>
+#include <fstream>
 #include <functional>
 #include <regex>
 #include <span>
@@ -31,11 +27,10 @@
 #include <variant>
 #include <vector>
 
-
-//using PropVariant = std::variant<std::string, float>;
+// using PropVariant = std::variant<std::string, float>;
 using PropVariant = std::variant<std::string, double>;
-using ObjProp = std::map<std::string,PropVariant>;
-using ObjValue = std::map<std::string,ObjProp >;
+using ObjProp = std::map<std::string, PropVariant>;
+using ObjValue = std::map<std::string, ObjProp>;
 using ObjUsr = std::map<sdbusplus::message::object_path, ObjValue>;
 
 #ifndef NETSNMPEXAMPLESCALARS_H
