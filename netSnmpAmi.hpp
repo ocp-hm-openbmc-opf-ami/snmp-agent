@@ -1,6 +1,6 @@
-#include <net-snmp/agent/net-snmp-agent-includes.h>
 #include <net-snmp/net-snmp-config.h>
 #include <net-snmp/net-snmp-includes.h>
+#include <net-snmp/agent/net-snmp-agent-includes.h>
 
 #include <boost/system/error_code.hpp>
 #include <sdbusplus/asio/property.hpp>
