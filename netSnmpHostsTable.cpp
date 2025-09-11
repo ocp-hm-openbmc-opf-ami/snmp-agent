@@ -66,12 +66,15 @@ void initialize_table_netSnmpHostsTable(void)
     if (NULL == table_data)
     {
         snmp_log(LOG_ERR, "error creating tdata table for netSnmpHostsTable\n");
+        netsnmp_handler_registration_free(reg);
         return;
     }
     table_info = SNMP_MALLOC_TYPEDEF(netsnmp_table_registration_info);
     if (NULL == table_info)
     {
         snmp_log(LOG_ERR, "error creating table info for netSnmpHostsTable\n");
+        netsnmp_handler_registration_free(reg);
+        netsnmp_tdata_delete_table(table_data);
         return;
     }
     netsnmp_table_helper_add_indexes(
@@ -144,7 +147,6 @@ netsnmp_tdata_row* netSnmpHostsTable_createEntry(
     memcpy(entry->netSnmpSensorRowIndex, netSnmpRowIndex, netSnmpRowIndex_len);
     entry->netSnmpSensorRowIndex_len = netSnmpRowIndex_len;
 
-    entry->netSnmpSensorValue = 44.0;
     entry->netSnmpSensorValue = amiSensorValue;
     entry->old_netSnmpSensorValue = 0.0;
 
