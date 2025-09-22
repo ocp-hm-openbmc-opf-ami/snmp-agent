@@ -205,7 +205,7 @@ bool SnmpUtilsManager::enableSNMPV3(bool value)
 bool SnmpUtilsManager::enableSNMPV3() const
 {
     bool currentValue = false;
-    currentValue = getSnmpVersionStatus("disableSNMPv1");
+    currentValue = getSnmpVersionStatus("disableSNMPv3");
     return !currentValue;
 }
 
