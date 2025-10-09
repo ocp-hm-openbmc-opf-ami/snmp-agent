@@ -109,8 +109,12 @@ void ConfManager::checkClientConfigured(const std::string& communityString,
         }
     }
 }
+
 void ConfManager::deleteSNMPClient(std::string id)
 {
+    std::string snmpdConfExtFilepath = "/etc/snmp/snmpd.conf.d/snmpd.conf";
+    bool isUpdated;
+
     auto it = clients.find(id);
     if (it == clients.end())
     {
@@ -135,6 +139,20 @@ void ConfManager::deleteSNMPClient(std::string id)
     {
         lg2::error("{FILE} doesn't exist", "FILE", fileName);
     }
+
+    /* Delete the SNMPClient subscription if one exists */
+    phosphor::network::snmp::deleteSNMPManager(id);
+
+    isUpdated = phosphor::network::snmp::updateFile(snmpdConfExtFilepath, id);
+
+    if (isUpdated)
+    {
+        if (system("systemctl restart snmpd.service") == -1)
+        {
+            lg2::error("Restarting the snmpd.service Failed....");
+        }
+    }
+
     // remove the D-Bus Object.
     this->clients.erase(it);
 }

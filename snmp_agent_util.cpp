@@ -291,6 +291,112 @@ void createSNMPv3User(const std::string userName, const std::string password,
     }
 }
 
+void deleteSNMPManager(const std::string& id)
+{
+    const std::string snmpService = "xyz.openbmc_project.Network.SNMP";
+    const std::string snmpManagerPath =
+        "/xyz/openbmc_project/network/snmp/manager";
+    const std::string ifaceNetworkClient = "xyz.openbmc_project.Network.Client";
+    try
+    {
+        auto bus = sdbusplus::bus::new_default();
+        auto method = bus.new_method_call(
+            snmpService.c_str(), snmpManagerPath.c_str(),
+            "org.freedesktop.DBus.ObjectManager", "GetManagedObjects");
+        auto reply = bus.call(method);
+
+        std::map<sdbusplus::message::object_path,
+                 std::map<std::string,
+                          std::map<std::string,
+                                   std::variant<std::string, uint16_t, bool>>>>
+            managedObjects;
+        reply.read(managedObjects);
+
+        for (const auto& [path, interfaces] : managedObjects)
+        {
+            auto it = interfaces.find(ifaceNetworkClient);
+            if (it == interfaces.end())
+                continue;
+
+            auto propIt = it->second.find("User");
+            if (propIt == it->second.end())
+                continue;
+
+            std::string userVal = std::get<std::string>(propIt->second);
+            if (userVal == id)
+            {
+                const std::string objPath = path;
+                auto delMethod = bus.new_method_call(
+                    snmpService.c_str(), objPath.c_str(),
+                    "xyz.openbmc_project.Object.Delete", "Delete");
+                bus.call(delMethod);
+                lg2::info("Deleted SNMP Manager object: {OBJ}", "OBJ",
+                          std::string(path));
+            }
+        }
+    }
+    catch (const std::exception& e)
+    {
+        lg2::error("Failed during deleteSNMPManager: {ERR}", "ERR", e.what());
+    }
+}
+
+bool updateFile(const std::string& filePath, const std::string& pattern)
+{
+    const std::string tmpFile = filePath + ".tmp";
+
+    try
+    {
+        std::filesystem::copy_file(
+            filePath, tmpFile,
+            std::filesystem::copy_options::overwrite_existing);
+
+        std::ifstream inFile(tmpFile);
+        if (!inFile.is_open())
+        {
+            lg2::error("Unable to open temp file: {FILE}", "FILE", tmpFile);
+            return false;
+        }
+
+        std::vector<std::string> filteredLines;
+        std::string line;
+        bool found = false;
+
+        while (std::getline(inFile, line))
+        {
+            if (line.find(pattern) != std::string::npos)
+            {
+                lg2::info("Removed line containing: {PATTERN}", "PATTERN",
+                          pattern);
+                found = true;
+                continue;
+            }
+            filteredLines.push_back(line);
+        }
+        inFile.close();
+
+        std::ofstream outFile(tmpFile, std::ios::trunc);
+        if (!outFile.is_open())
+        {
+            lg2::error("Unable to reopen temp file for writing: {FILE}", "FILE",
+                       tmpFile);
+            return false;
+        }
+
+        for (const auto& l : filteredLines)
+            outFile << l << "\n";
+        outFile.close();
+
+        std::filesystem::rename(tmpFile, filePath);
+        return found;
+    }
+    catch (const std::exception& e)
+    {
+        lg2::error("Failed to update file: {ERR}", "ERR", e.what());
+        return false;
+    }
+}
+
 } // namespace snmp
 } // namespace network
 } // namespace phosphor

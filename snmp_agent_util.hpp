@@ -97,6 +97,10 @@ bool ReadWritePermissionValidate(std::string value);
 void createSNMPv3User(const std::string userName, const std::string password,
                       const std::string encryption, const std::string algorithm,
                       const std::string readWritePermission);
+
+void deleteSNMPManager(const std::string& id);
+bool updateFile(const std::string& filePath, const std::string& pattern);
+
 } // namespace snmp
 } // namespace network
 
