@@ -624,9 +624,14 @@ void setup_sensorTable(netsnmp_tdata* table_data)
             amiTest.sensorName =
                 subPath[i].substr(sensorPaths[amiRowIndex[0] - 1].size());
             amiTest.sensorValue = getSensorInfo(subPath[i], iface);
-            netSnmpHostsTable_createEntry(table_data, amiRowIndex,
+            netsnmp_tdata_row* row = netSnmpHostsTable_createEntry(table_data, amiRowIndex,
                                           amiRowIndex_len, amiTest.sensorName,
                                           amiTest.sensorValue);
+	    if (!row)
+            {
+                snmp_log(LOG_ERR, "error in creating SNMP table entry\n");
+		continue;
+            }
             amiRowIndex[1] = i + 1;
         }
     }

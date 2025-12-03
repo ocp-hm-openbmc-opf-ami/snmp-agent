@@ -319,13 +319,15 @@ int handle_amiSnmpFloat(netsnmp_mib_handler* handler,
     switch (reqinfo->mode)
     {
         case MODE_GET:
+	  u_char floatBuf[sizeof(float)];
+	  memcpy(floatBuf, &amiFloat, sizeof(float));
           /* Reason: Net-SNMP's snmp_set_var_typed_value() function internally
            * manages the buffer size to always fit the storing data */
           /* coverity[overrun-local: FALSE] */
           snmp_set_var_typed_value(
               requests->requestvb, ASN_OPAQUE_FLOAT,
-              /* XXX: a pointer to the scalar's data */ &amiFloat,
-              /* XXX: the length of the data in bytes */ sizeof(amiFloat));
+              /* XXX: a pointer to the scalar's data */ floatBuf,
+              /* XXX: the length of the data in bytes */ sizeof(float));
           break;
 
         /*
@@ -397,13 +399,15 @@ int handle_amiSnmpInlet_BRD_Temp(
     switch (reqinfo->mode)
     {
         case MODE_GET:
+	  u_char floatBuf[sizeof(float)];
+	  memcpy(floatBuf, &amiFloat, sizeof(float));
           /* Reason: Net-SNMP's snmp_set_var_typed_value() function internally
            * manages the buffer size to always fit the storing data */
           /* coverity[overrun-local: FALSE] */
           snmp_set_var_typed_value(
               requests->requestvb, ASN_OPAQUE_FLOAT,
-              /* XXX: a pointer to the scalar's data */ &amiFloat,
-              /* XXX: the length of the data in bytes */ sizeof(amiFloat));
+              /* XXX: a pointer to the scalar's data */ floatBuf,
+              /* XXX: the length of the data in bytes */ sizeof(float));
           break;
 
         /*
