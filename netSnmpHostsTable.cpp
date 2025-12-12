@@ -173,9 +173,13 @@ netsnmp_tdata_row* netSnmpHostsTable_createEntry(
     // netsnmp_tdata_row_add_index( row, ASN_OCTET_STR,
     //                           entry->netSnmpHostName, netSnmpHostName_len);
 
-    netsnmp_tdata_row_add_index(row, ASN_OCTET_STR,
+    if(netsnmp_tdata_row_add_index(row, ASN_OCTET_STR,
                                 &(entry->netSnmpSensorRowIndex),
-                                sizeof(entry->netSnmpSensorRowIndex));
+                                sizeof(entry->netSnmpSensorRowIndex)) != SNMPERR_SUCCESS)
+    {
+	netsnmp_tdata_delete_row(row);
+	return NULL;
+    }
 
     if (table_data)
     {
@@ -624,14 +628,9 @@ void setup_sensorTable(netsnmp_tdata* table_data)
             amiTest.sensorName =
                 subPath[i].substr(sensorPaths[amiRowIndex[0] - 1].size());
             amiTest.sensorValue = getSensorInfo(subPath[i], iface);
-            netsnmp_tdata_row* row = netSnmpHostsTable_createEntry(table_data, amiRowIndex,
+            netSnmpHostsTable_createEntry(table_data, amiRowIndex,
                                           amiRowIndex_len, amiTest.sensorName,
                                           amiTest.sensorValue);
-	    if (!row)
-            {
-                snmp_log(LOG_ERR, "error in creating SNMP table entry\n");
-		continue;
-            }
             amiRowIndex[1] = i + 1;
         }
     }
