@@ -1,7 +1,7 @@
 #include "config.h"
 
 #include "snmp_user_manager.hpp"
-
+#include "Encryption.hpp"
 #include "snmp_agent_serialize.hpp"
 #include "snmp_agent_util.hpp"
 #include "xyz/openbmc_project/Common/error.hpp"
@@ -89,11 +89,18 @@ void ConfManager::checkClientConfigured(
     const std::string readWritePermission)
 {
     isSameUser = false;
+    std::string DecryptedPswd;
+    int outlen = 0;
 
     for (const auto& val : clients)
     {
+	    DecryptedPswd=val.second.get()->password();
+	    if(!DecryptedPswd.empty())
+	    {
+		    DecryptedPswd=decryptString(DecryptedPswd.c_str(),&outlen);
+	    }
         if (val.second.get()->userName() == userName &&
-            val.second.get()->password() == password &&
+            DecryptedPswd == password &&
             val.second.get()->encryption() == encryption &&
             val.second.get()->algorithm() == algorithm &&
             val.second.get()->readWritePermission() == readWritePermission)

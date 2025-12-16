@@ -49,6 +49,7 @@ phosphor_snmp_dep = dependency('phosphor-snmp')
 systemd_dep = dependency('systemd')
 
 netsnmp_dep = dependency('netsnmp')
+openssl_dep = dependency('openssl')
 
 cpp = meson.get_compiler('cpp')
 
@@ -60,6 +61,7 @@ snmp_agent_dep = [
      sdbusplus,
      sdeventplus,
      netsnmp_dep,
+     openssl_dep,
 ]
 
 snmp_agent_src = [
@@ -87,7 +89,9 @@ snmp_agent_src = [
      'netSnmpAmi.cpp',
      'netSnmpAmi.hpp',
      'netSnmpHostsTable.hpp',
-     'netSnmpHostsTable.cpp'
+     'netSnmpHostsTable.cpp',
+     'Encryption.hpp',
+     'Encryption.cpp'
 ]
 
 executable(
