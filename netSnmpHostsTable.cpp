@@ -177,6 +177,7 @@ netsnmp_tdata_row* netSnmpHostsTable_createEntry(
                                 &(entry->netSnmpSensorRowIndex),
                                 sizeof(entry->netSnmpSensorRowIndex)) != SNMPERR_SUCCESS)
     {
+	SNMP_FREE(entry);
 	netsnmp_tdata_delete_row(row);
 	return NULL;
     }
