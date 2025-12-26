@@ -62,6 +62,7 @@ bool SnmpUtilsManager::sendSNMPTrap()
     static auto bus = sdbusplus::bus::new_default();
     const std::string& service = "xyz.openbmc_project.User.Manager";
     const std::string& objPath = "/xyz/openbmc_project/user";
+    bool result = false;
 
     ObjectValueTree interfaces;
 
@@ -91,8 +92,17 @@ bool SnmpUtilsManager::sendSNMPTrap()
     std::strftime(TrapGenerateTime, sizeof(TrapGenerateTime),
                   "%a %b %d %H:%M:%S %Z %Y", timeInfo);
 
-    sendTrap<OBMCErrorNotification>(0, TrapGenerateTime, "NA", "Test Alert");
-    return true;
+
+    try {
+        result = sendTrap<OBMCErrorNotification>(0, TrapGenerateTime, "NA", "Test Alert");
+        return result;
+    } catch (const std::exception& e) {
+        std::cerr << "sendTrap exception: " << e.what() << std::endl;
+        return false;
+    } catch (...) {
+        std::cerr << "sendTrap unknown exception" << std::endl;
+        return false;
+    }
 }
 
 bool SnmpUtilsManager::snmpTrapStatus(bool value)
