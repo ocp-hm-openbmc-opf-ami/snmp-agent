@@ -10,8 +10,8 @@ const std::string snmpdConfExtFileDir = "/etc/snmp/snmpd.conf.d/";
 const std::string snmpConfFilepath = "/etc/snmp/snmp.conf";
 const std::string snmpdServiceName = "snmpd.service";
 
-const std::string roCommunity   = "rocommunity";
-const std::string rwCommunity   = "rwcommunity";
+const std::string roCommunity = "rocommunity";
+const std::string rwCommunity = "rwcommunity";
 const std::string fieldSeparator = " ";
 
 enum class ServiceAction
@@ -390,7 +390,9 @@ bool getSnmpVersionStatus(const std::string& version)
     return false;
 }
 
-bool communityStringPropertyModify(const std::string& requestedCommunityString, const std::string& propertyName, const std::string& newValue)
+bool communityStringPropertyModify(const std::string& requestedCommunityString,
+                                   const std::string& propertyName,
+                                   const std::string& newValue)
 {
     const std::string tmpConfFilePath = "/etc/snmp/snmpd.conf.d/snmpd_tmp.conf";
     bool communityStringFound = false;
@@ -406,7 +408,8 @@ bool communityStringPropertyModify(const std::string& requestedCommunityString, 
     std::ofstream tmpConfFileStream(tmpConfFilePath);
     if (!tmpConfFileStream.is_open())
     {
-        std::cerr << "Unable to create temporary file: " << tmpConfFilePath << "\n";
+        std::cerr << "Unable to create temporary file: " << tmpConfFilePath
+                  << "\n";
         snmpdConfExtFileStream.close();
         return false;
     }
@@ -417,13 +420,15 @@ bool communityStringPropertyModify(const std::string& requestedCommunityString, 
             line.find(rwCommunity) != std::string::npos)
         {
             std::istringstream lineStream(line);
-            std::string accessType, communityStringFromConfig, defaultStr, snmpView, profile;
-            lineStream >> accessType >> communityStringFromConfig >> defaultStr >> snmpView >> profile;
+            std::string accessType, communityStringFromConfig, defaultStr,
+                snmpView, profile;
+            lineStream >> accessType >> communityStringFromConfig >>
+                defaultStr >> snmpView >> profile;
 
             if (communityStringFromConfig == requestedCommunityString)
             {
                 communityStringFound = true;
-               
+
                 if (propertyName == "ReadWritePermission")
                 {
                     if (accessType == roCommunity)
@@ -439,9 +444,11 @@ bool communityStringPropertyModify(const std::string& requestedCommunityString, 
                 {
                     profile = newValue;
                 }
-                
-                tmpConfFileStream << accessType << fieldSeparator << communityStringFromConfig << fieldSeparator 
-                                  << defaultStr << fieldSeparator << snmpView << fieldSeparator << profile << '\n';
+
+                tmpConfFileStream
+                    << accessType << fieldSeparator << communityStringFromConfig
+                    << fieldSeparator << defaultStr << fieldSeparator
+                    << snmpView << fieldSeparator << profile << '\n';
             }
             else
             {
@@ -459,7 +466,8 @@ bool communityStringPropertyModify(const std::string& requestedCommunityString, 
 
     if (!communityStringFound)
     {
-        std::cerr << "Error: Community string '" << requestedCommunityString << "' not found.\n";
+        std::cerr << "Error: Community string '" << requestedCommunityString
+                  << "' not found.\n";
         if (std::remove(tmpConfFilePath.c_str()) != 0)
         {
             std::cerr << "Failed to remove temporary config file \n";

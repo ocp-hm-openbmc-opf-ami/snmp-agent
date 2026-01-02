@@ -92,14 +92,19 @@ bool SnmpUtilsManager::sendSNMPTrap()
     std::strftime(TrapGenerateTime, sizeof(TrapGenerateTime),
                   "%a %b %d %H:%M:%S %Z %Y", timeInfo);
 
-
-    try {
-        result = sendTrap<OBMCErrorNotification>(0, TrapGenerateTime, "NA", "Test Alert");
+    try
+    {
+        result = sendTrap<OBMCErrorNotification>(0, TrapGenerateTime, "NA",
+                                                 "Test Alert");
         return result;
-    } catch (const std::exception& e) {
+    }
+    catch (const std::exception& e)
+    {
         std::cerr << "sendTrap exception: " << e.what() << std::endl;
         return false;
-    } catch (...) {
+    }
+    catch (...)
+    {
         std::cerr << "sendTrap unknown exception" << std::endl;
         return false;
     }

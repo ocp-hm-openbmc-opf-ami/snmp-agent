@@ -1,6 +1,7 @@
 #include "config.h"
 
 #include "snmp_user_manager.hpp"
+
 #include "Encryption.hpp"
 #include "snmp_agent_serialize.hpp"
 #include "snmp_agent_util.hpp"
@@ -94,11 +95,11 @@ void ConfManager::checkClientConfigured(
 
     for (const auto& val : clients)
     {
-	    DecryptedPswd=val.second.get()->password();
-	    if(!DecryptedPswd.empty())
-	    {
-		    DecryptedPswd=decryptString(DecryptedPswd.c_str(),&outlen);
-	    }
+        DecryptedPswd = val.second.get()->password();
+        if (!DecryptedPswd.empty())
+        {
+            DecryptedPswd = decryptString(DecryptedPswd.c_str(), &outlen);
+        }
         if (val.second.get()->userName() == userName &&
             DecryptedPswd == password &&
             val.second.get()->encryption() == encryption &&

@@ -1,9 +1,9 @@
 #include "snmp_agent_client.hpp"
 
+#include "snmpModifyConf.hpp"
 #include "snmp_agent_serialize.hpp"
 #include "snmp_agent_util.hpp"
 #include "snmp_conf_manager.hpp"
-#include "snmpModifyConf.hpp"
 #include "xyz/openbmc_project/Common/error.hpp"
 
 #include <arpa/inet.h>
@@ -67,14 +67,16 @@ std::string CommunityStrManager::readWritePermission(std::string value)
         {
             return value;
         }
-        
-	std::string currentValue = Ifaces::readWritePermission();
+
+        std::string currentValue = Ifaces::readWritePermission();
         if (!currentValue.empty())
         {
-            if (!communityStringPropertyModify(communityRef, "ReadWritePermission", value))
+            if (!communityStringPropertyModify(communityRef,
+                                               "ReadWritePermission", value))
             {
-                elog<InvalidArgument>(Argument::ARGUMENT_NAME("ReadWritePermission"),
-                                      Argument::ARGUMENT_VALUE(value.c_str()));
+                elog<InvalidArgument>(
+                    Argument::ARGUMENT_NAME("ReadWritePermission"),
+                    Argument::ARGUMENT_VALUE(value.c_str()));
             }
         }
 
@@ -99,13 +101,15 @@ std::string CommunityStrManager::communityProfile(std::string value)
             return value;
         }
 
-	std::string currentValue = Ifaces::communityProfile();
+        std::string currentValue = Ifaces::communityProfile();
         if (!currentValue.empty())
         {
-            if (!communityStringPropertyModify(communityRef, "CommunityProfile", value))
+            if (!communityStringPropertyModify(communityRef, "CommunityProfile",
+                                               value))
             {
-                elog<InvalidArgument>(Argument::ARGUMENT_NAME("CommunityProfile"),
-                                      Argument::ARGUMENT_VALUE(value.c_str()));
+                elog<InvalidArgument>(
+                    Argument::ARGUMENT_NAME("CommunityProfile"),
+                    Argument::ARGUMENT_VALUE(value.c_str()));
             }
         }
 

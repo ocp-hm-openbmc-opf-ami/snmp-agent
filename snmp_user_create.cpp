@@ -1,4 +1,5 @@
 #include "snmp_user_create.hpp"
+
 #include "Encryption.hpp"
 #include "snmp_agent_serialize.hpp"
 #include "snmp_agent_util.hpp"
@@ -60,12 +61,12 @@ std::string UserManager::userName(std::string value)
 std::string UserManager::password(std::string value)
 {
     std ::string userRef = Ifaces::userName();
-    if(passwordValidate(value))
+    if (passwordValidate(value))
     {
-	    std::string EncPswd = encryptString(value);
-	    Ifaces::password(EncPswd);
-	    serialize(userRef, *this, parent.dbusPersistentLocation);
-	    return EncPswd;
+        std::string EncPswd = encryptString(value);
+        Ifaces::password(EncPswd);
+        serialize(userRef, *this, parent.dbusPersistentLocation);
+        return EncPswd;
     }
     else
     {

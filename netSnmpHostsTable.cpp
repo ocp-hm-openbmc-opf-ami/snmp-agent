@@ -173,13 +173,13 @@ netsnmp_tdata_row* netSnmpHostsTable_createEntry(
     // netsnmp_tdata_row_add_index( row, ASN_OCTET_STR,
     //                           entry->netSnmpHostName, netSnmpHostName_len);
 
-    if(netsnmp_tdata_row_add_index(row, ASN_OCTET_STR,
-                                &(entry->netSnmpSensorRowIndex),
-                                sizeof(entry->netSnmpSensorRowIndex)) != SNMPERR_SUCCESS)
+    if (netsnmp_tdata_row_add_index(
+            row, ASN_OCTET_STR, &(entry->netSnmpSensorRowIndex),
+            sizeof(entry->netSnmpSensorRowIndex)) != SNMPERR_SUCCESS)
     {
-	SNMP_FREE(entry);
-	netsnmp_tdata_delete_row(row);
-	return NULL;
+        SNMP_FREE(entry);
+        netsnmp_tdata_delete_row(row);
+        return NULL;
     }
 
     if (table_data)

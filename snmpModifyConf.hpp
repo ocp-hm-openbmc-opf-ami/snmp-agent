@@ -19,4 +19,6 @@ void registerSnmpDbus(
 void SetSnmpVersionStatus(const std::string& version, bool setStatus);
 bool getSnmpVersionStatus(const std::string& version);
 bool removeCommunityString(const std::string& communityString);
-bool communityStringPropertyModify(const std::string& communityString, const std::string& propertyName, const std::string& newValue);
+bool communityStringPropertyModify(const std::string& communityString,
+                                   const std::string& propertyName,
+                                   const std::string& newValue);

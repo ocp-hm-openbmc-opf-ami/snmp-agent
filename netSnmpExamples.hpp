@@ -3,9 +3,21 @@
  * using mib2c.scalar.conf
  */
 
+/*
+ * Net-SNMP headers are order-sensitive and must be included as shown below.
+ * net-snmp-config.h defines mandatory build/configuration macros and must be
+ * included before any other Net-SNMP headers.
+ * net-snmp-includes.h provides core library types and typedefs (e.g.,
+ * netsnmp_container) required by higher-level components.
+ * net-snmp-agent-includes.h pulls in the SNMP agent framework and assumes
+ * all configuration macros and core types are already defined.
+ * Reordering these includes (e.g., by clang-format) will break the build.
+ */
+// clang-format off
 #include <net-snmp/net-snmp-config.h>
 #include <net-snmp/net-snmp-includes.h>
 #include <net-snmp/agent/net-snmp-agent-includes.h>
+// clang-format on
 
 #include <boost/system/error_code.hpp> // IWYU pragma: keep
 #include <sdbusplus/asio/property.hpp>

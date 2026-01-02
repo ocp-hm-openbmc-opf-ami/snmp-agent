@@ -319,14 +319,14 @@ int handle_amiSnmpFloat(netsnmp_mib_handler* handler,
     switch (reqinfo->mode)
     {
         case MODE_GET:
-          /* Reason: Net-SNMP's snmp_set_var_typed_value() function internally
-           * manages the buffer size to always fit the storing data */
-          /* coverity[overrun-buffer-val : FALSE] */
-          snmp_set_var_typed_value(
-              requests->requestvb, ASN_OPAQUE_FLOAT,
-              /* XXX: a pointer to the scalar's data */ &amiFloat,
-              /* XXX: the length of the data in bytes */ sizeof(amiFloat));
-          break;
+            /* Reason: Net-SNMP's snmp_set_var_typed_value() function internally
+             * manages the buffer size to always fit the storing data */
+            /* coverity[overrun-buffer-val : FALSE] */
+            snmp_set_var_typed_value(
+                requests->requestvb, ASN_OPAQUE_FLOAT,
+                /* XXX: a pointer to the scalar's data */ &amiFloat,
+                /* XXX: the length of the data in bytes */ sizeof(amiFloat));
+            break;
 
         /*
          * SET REQUEST
@@ -397,14 +397,14 @@ int handle_amiSnmpInlet_BRD_Temp(
     switch (reqinfo->mode)
     {
         case MODE_GET:
-          /* Reason: Net-SNMP's snmp_set_var_typed_value() function internally
-           * manages the buffer size to always fit the storing data */
-          /* coverity[overrun-buffer-val : FALSE] */
-          snmp_set_var_typed_value(
-              requests->requestvb, ASN_OPAQUE_FLOAT,
-              /* XXX: a pointer to the scalar's data */ &amiFloat,
-              /* XXX: the length of the data in bytes */ sizeof(amiFloat));
-          break;
+            /* Reason: Net-SNMP's snmp_set_var_typed_value() function internally
+             * manages the buffer size to always fit the storing data */
+            /* coverity[overrun-buffer-val : FALSE] */
+            snmp_set_var_typed_value(
+                requests->requestvb, ASN_OPAQUE_FLOAT,
+                /* XXX: a pointer to the scalar's data */ &amiFloat,
+                /* XXX: the length of the data in bytes */ sizeof(amiFloat));
+            break;
 
         /*
          * SET REQUEST
