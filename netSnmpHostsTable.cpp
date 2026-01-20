@@ -182,10 +182,14 @@ netsnmp_tdata_row* netSnmpHostsTable_createEntry(
         return NULL;
     }
 
-    if (table_data)
+    if (!table_data)
     {
-        netsnmp_tdata_add_row(table_data, row);
+        SNMP_FREE(entry);
+        netsnmp_tdata_delete_row(row);
+        return NULL;
     }
+
+    netsnmp_tdata_add_row(table_data, row);
     return row;
 }
 
