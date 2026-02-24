@@ -39,6 +39,40 @@ UserManager::UserManager(
     this->readWritePermission(std::move(readWritePermission));
 }
 
+bool reConfigureSnmpUser(std::string userName)
+{
+    bool isUpdatedSnmpUSMConfFile = false;
+    bool isUpdatedSnmpConfFile = false;
+    constexpr std::string_view snmpUSMConfFile = "/var/lib/net-snmp/snmpd.conf";
+    std::string snmpConfFile = "/etc/snmpd.conf";
+
+    // Stop the SNMP service before modifying configuration files
+    if (system("systemctl stop snmpd.service") == -1)
+    {
+        lg2::error("Stopping the snmpd.service Failed....");
+        return false;
+    }
+
+    // Update both SNMP configuration files to remove user entries
+    isUpdatedSnmpUSMConfFile = phosphor::network::snmp::updateFile(
+        std::string{snmpUSMConfFile}, userName);
+    isUpdatedSnmpConfFile =
+        phosphor::network::snmp::updateFile(snmpConfFile, userName);
+
+    // Log results
+    if (isUpdatedSnmpUSMConfFile || isUpdatedSnmpConfFile)
+    {
+        lg2::info("Successfully removed user entries from config files: {USER}",
+                  "USER", userName);
+        return true;
+    }
+    else
+    {
+        lg2::info("No entries found for user: {USER}", "USER", userName);
+        return false;
+    }
+}
+
 std::string UserManager::userName(std::string value)
 {
     if (userNameValidate(value))
@@ -65,6 +99,12 @@ std::string UserManager::password(std::string value)
     {
         std::string EncPswd = encryptString(value);
         Ifaces::password(EncPswd);
+        if (reConfigureSnmpUser(userRef))
+        {
+            createSNMPv3User(userRef, value, Ifaces::encryption(),
+                             Ifaces::algorithm(),
+                             Ifaces::readWritePermission());
+        }
         serialize(userRef, *this, parent.dbusPersistentLocation);
         return EncPswd;
     }
@@ -86,6 +126,13 @@ std::string UserManager::encryption(std::string value)
             return value;
         }
         auto username = Ifaces::encryption(value);
+        int outLen = 0;
+        if (reConfigureSnmpUser(userRef))
+        {
+            createSNMPv3User(
+                userRef, decryptString(Ifaces::password(), &outLen), value,
+                Ifaces::algorithm(), Ifaces::readWritePermission());
+        }
         serialize(userRef, *this, parent.dbusPersistentLocation);
         return username;
     }
@@ -107,6 +154,13 @@ std::string UserManager::algorithm(std::string value)
             return value;
         }
         auto comStr = Ifaces::algorithm(value);
+        int outLen = 0;
+        if (reConfigureSnmpUser(userRef))
+        {
+            createSNMPv3User(
+                userRef, decryptString(Ifaces::password(), &outLen),
+                Ifaces::encryption(), value, Ifaces::readWritePermission());
+        }
         serialize(userRef, *this, parent.dbusPersistentLocation);
         return comStr;
     }
@@ -128,6 +182,13 @@ std::string UserManager::readWritePermission(std::string value)
             return value;
         }
         auto algorithm = Ifaces::readWritePermission(value);
+        int outLen = 0;
+        if (reConfigureSnmpUser(userRef))
+        {
+            createSNMPv3User(userRef,
+                             decryptString(Ifaces::password(), &outLen),
+                             Ifaces::encryption(), Ifaces::algorithm(), value);
+        }
         serialize(userRef, *this, parent.dbusPersistentLocation);
         return algorithm;
     }
