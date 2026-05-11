@@ -32,11 +32,13 @@ UserManager::UserManager(
     const std::string readWritePermission) :
     Ifaces(bus, objPath, Ifaces::action::defer_emit), parent(parent)
 {
+    isInitialize = true;
     this->userName(std::move(userName));
     this->password(std::move(password));
     this->encryption(std::move(encryption));
     this->algorithm(std::move(algorithm));
     this->readWritePermission(std::move(readWritePermission));
+    isInitialize = false;
 }
 
 bool reConfigureSnmpUser(std::string userName)
@@ -99,13 +101,16 @@ std::string UserManager::password(std::string value)
     {
         std::string EncPswd = encryptString(value);
         Ifaces::password(EncPswd);
-        if (reConfigureSnmpUser(userRef))
+        if (!isInitialize)
         {
-            createSNMPv3User(userRef, value, Ifaces::encryption(),
-                             Ifaces::algorithm(),
-                             Ifaces::readWritePermission());
+            if (reConfigureSnmpUser(userRef))
+            {
+                createSNMPv3User(userRef, value, Ifaces::encryption(),
+                                 Ifaces::algorithm(),
+                                 Ifaces::readWritePermission());
+            }
+            serialize(userRef, *this, parent.dbusPersistentLocation);
         }
-        serialize(userRef, *this, parent.dbusPersistentLocation);
         return EncPswd;
     }
     else
@@ -127,13 +132,16 @@ std::string UserManager::encryption(std::string value)
         }
         auto username = Ifaces::encryption(value);
         int outLen = 0;
-        if (reConfigureSnmpUser(userRef))
+        if (!isInitialize)
         {
-            createSNMPv3User(
-                userRef, decryptString(Ifaces::password(), &outLen), value,
-                Ifaces::algorithm(), Ifaces::readWritePermission());
+            if (reConfigureSnmpUser(userRef))
+            {
+                createSNMPv3User(
+                    userRef, decryptString(Ifaces::password(), &outLen), value,
+                    Ifaces::algorithm(), Ifaces::readWritePermission());
+            }
+            serialize(userRef, *this, parent.dbusPersistentLocation);
         }
-        serialize(userRef, *this, parent.dbusPersistentLocation);
         return username;
     }
     else
@@ -155,13 +163,16 @@ std::string UserManager::algorithm(std::string value)
         }
         auto comStr = Ifaces::algorithm(value);
         int outLen = 0;
-        if (reConfigureSnmpUser(userRef))
+        if (!isInitialize)
         {
-            createSNMPv3User(
-                userRef, decryptString(Ifaces::password(), &outLen),
-                Ifaces::encryption(), value, Ifaces::readWritePermission());
+            if (reConfigureSnmpUser(userRef))
+            {
+                createSNMPv3User(
+                    userRef, decryptString(Ifaces::password(), &outLen),
+                    Ifaces::encryption(), value, Ifaces::readWritePermission());
+            }
+            serialize(userRef, *this, parent.dbusPersistentLocation);
         }
-        serialize(userRef, *this, parent.dbusPersistentLocation);
         return comStr;
     }
     else
@@ -183,13 +194,16 @@ std::string UserManager::readWritePermission(std::string value)
         }
         auto algorithm = Ifaces::readWritePermission(value);
         int outLen = 0;
-        if (reConfigureSnmpUser(userRef))
+        if (!isInitialize)
         {
-            createSNMPv3User(userRef,
-                             decryptString(Ifaces::password(), &outLen),
-                             Ifaces::encryption(), Ifaces::algorithm(), value);
+            if (reConfigureSnmpUser(userRef))
+            {
+                createSNMPv3User(
+                    userRef, decryptString(Ifaces::password(), &outLen),
+                    Ifaces::encryption(), Ifaces::algorithm(), value);
+            }
+            serialize(userRef, *this, parent.dbusPersistentLocation);
         }
-        serialize(userRef, *this, parent.dbusPersistentLocation);
         return algorithm;
     }
     else

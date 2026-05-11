@@ -208,8 +208,7 @@ bool passwordValidate(std::string value)
 }
 bool encryptionValidate(std::string value)
 {
-    constexpr std::array<std::string_view, 1> propertieAllowdValues = {
-        "AES"};
+    constexpr std::array<std::string_view, 1> propertieAllowdValues = {"AES"};
     if (value.empty() ||
         (std::find(propertieAllowdValues.begin(), propertieAllowdValues.end(),
                    value) == propertieAllowdValues.end()))

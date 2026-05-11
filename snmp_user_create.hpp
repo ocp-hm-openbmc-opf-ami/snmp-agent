@@ -157,6 +157,15 @@ class UserManager : public Ifaces
   private:
     /** @brief Parent D-Bus Object. */
     ConfManager& parent;
+
+    /** @brief Flag to indicate that the object is being initialized.
+     *  Set to true during construction to prevent side effects
+     *  (reConfigureSnmpUser, createSNMPv3User, serialize) from
+     *  being triggered by property setters during initial object
+     *  creation. Reset to false after construction completes so
+     *  that subsequent property updates behave normally.
+     */
+    bool isInitialize = false;
 };
 } // namespace user
 } // namespace snmp
