@@ -69,8 +69,18 @@ class UserManager : public Ifaces
      */
     UserManager(sdbusplus::bus_t& bus, const char* objPath,
                 ConfManager& parent) :
-        Ifaces(bus, objPath, Ifaces::action::defer_emit), parent(parent)
+        Ifaces(bus, objPath, Ifaces::action::defer_emit), id(0), parent(parent)
     {}
+
+    /** @brief Control whether property setters trigger SNMP user creation.
+     *  @param[in] value - true to prevent setters from calling
+     * createSNMPv3User() and serialize() during object initialization or
+     * restoration; false to allow normal setter behavior
+     */
+    void setInitializeFlag(bool value)
+    {
+        isInitialize = value;
+    }
 
     /** @brief Update the address of the object.
      *

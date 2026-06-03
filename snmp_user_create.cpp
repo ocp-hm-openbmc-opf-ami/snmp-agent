@@ -30,7 +30,7 @@ UserManager::UserManager(
     const std::string userName, const std::string password,
     const std::string encryption, const std::string algorithm,
     const std::string readWritePermission) :
-    Ifaces(bus, objPath, Ifaces::action::defer_emit), parent(parent)
+    Ifaces(bus, objPath, Ifaces::action::defer_emit), id(0), parent(parent)
 {
     isInitialize = true;
     this->userName(std::move(userName));
@@ -84,7 +84,10 @@ std::string UserManager::userName(std::string value)
             return value;
         }
         auto addr = Ifaces::userName(value);
-        serialize(value, *this, parent.dbusPersistentLocation);
+        if (!isInitialize)
+        {
+            serialize(value, *this, parent.dbusPersistentLocation);
+        }
         return addr;
     }
     else

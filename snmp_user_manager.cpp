@@ -26,6 +26,8 @@ using namespace sdbusplus::xyz::openbmc_project::Common::Error;
 using Argument = xyz::openbmc_project::Common::InvalidArgument;
 using namespace phosphor::network::snmp;
 
+bool reConfigureSnmpUser(std::string userName);
+
 ConfManager::ConfManager(sdbusplus::bus_t& bus, const char* objPath) :
     details::CreateIface(bus, objPath,
                          details::CreateIface::action::defer_emit),
@@ -188,8 +190,28 @@ void ConfManager::restoreClients()
         fs::path objPath = objectPath + "/" + userRef;
         auto manager =
             std::make_unique<UserManager>(bus, objPath.string().c_str(), *this);
+
+        manager->setInitializeFlag(true);
         if (deserialize(confFile.path(), *manager))
         {
+            std::string doubleEncryptedPwd = manager->password();
+
+            int plaintextLen = 0;
+            std::string singleEncryptedPwd =
+                decryptString(doubleEncryptedPwd, &plaintextLen);
+            std::string plaintextPwd =
+                decryptString(singleEncryptedPwd, &plaintextLen);
+
+            std::string encryptionAlgo = manager->encryption();
+            std::string authAlgo = manager->algorithm();
+            std::string permission = manager->readWritePermission();
+
+            bool cleanupResult = reConfigureSnmpUser(userRef);
+            (void)cleanupResult;
+            createSNMPv3User(userRef, plaintextPwd, encryptionAlgo, authAlgo,
+                             permission);
+            manager->setInitializeFlag(false);
+
             manager->emit_object_added();
             this->clients.emplace(userRef, std::move(manager));
         }
