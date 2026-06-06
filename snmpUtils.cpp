@@ -59,55 +59,8 @@ bool readBoolFromFile(std::string& filename)
 
 bool SnmpUtilsManager::sendSNMPTrap()
 {
-    static auto bus = sdbusplus::bus::new_default();
-    const std::string& service = "xyz.openbmc_project.User.Manager";
-    const std::string& objPath = "/xyz/openbmc_project/user";
-    bool result = false;
-
-    ObjectValueTree interfaces;
-
-    auto method = bus.new_method_call(service.c_str(), objPath.c_str(),
-                                      "org.freedesktop.DBus.ObjectManager",
-                                      "GetManagedObjects");
-    try
-    {
-        std::cerr << "buca call success" << std::endl;
-        auto reply = bus.call(method);
-        std::cerr << "buca call response" << std::endl;
-        reply.read(interfaces);
-        std::cerr << "buca call parse" << std::endl;
-    }
-    catch (const sdbusplus::exception_t& e)
-    {
-        std::cerr << "buca call fail" << std::endl;
-        lg2::error("Failed to get managed objects: {PATH}", "PATH", objPath);
-        elog<InternalFailure>();
-    }
-
-    std::cerr << "buca call success" << std::endl;
-
-    std::time_t currentTime = std::time(nullptr);
-    struct tm* timeInfo = std::localtime(&currentTime);
-    char TrapGenerateTime[80];
-    std::strftime(TrapGenerateTime, sizeof(TrapGenerateTime),
-                  "%a %b %d %H:%M:%S %Z %Y", timeInfo);
-
-    try
-    {
-        result = sendTrap<OBMCErrorNotification>(0, TrapGenerateTime, "NA",
-                                                 "Test Alert");
-        return result;
-    }
-    catch (const std::exception& e)
-    {
-        std::cerr << "sendTrap exception: " << e.what() << std::endl;
-        return false;
-    }
-    catch (...)
-    {
-        std::cerr << "sendTrap unknown exception" << std::endl;
-        return false;
-    }
+    lg2::info("SNMP trap trigger request ignored: functionality removed");
+    return true;
 }
 
 bool SnmpUtilsManager::snmpTrapStatus(bool value)

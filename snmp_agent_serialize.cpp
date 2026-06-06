@@ -74,7 +74,7 @@ fs::path serialize(const std::string communityName,
     if (!os.is_open())
     {
         std::cerr << "Error: Could not open file " << fileName << std::endl;
-        fileName = nullptr;
+        fileName = "";
         return fileName;
     }
     cereal::BinaryOutputArchive oarchive(os);

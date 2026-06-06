@@ -1,8 +1,6 @@
 #pragma once
 
-#include "snmp.hpp"
 #include "snmpModifyConf.hpp"
-#include "snmp_notification.hpp"
 #include "xyz/openbmc_project/Snmp/SnmpUtils/server.hpp"
 
 #include <sdbusplus/bus.hpp>
@@ -19,7 +17,6 @@ namespace SnmpUtils
 {
 
 using SNMPIface = sdbusplus::xyz::openbmc_project::Snmp::server::SnmpUtils;
-using namespace phosphor::network::snmp;
 
 class SnmpUtilsManager : public SNMPIface
 {

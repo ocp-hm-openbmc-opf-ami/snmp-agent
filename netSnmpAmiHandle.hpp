@@ -8,11 +8,11 @@
 #include "netSnmpExamples.hpp"
 
 #include <net-snmp/agent/cache_handler.h>
-#include <net-snmp/agent/net-snmp-agent-includes.h>
 #include <net-snmp/agent/struct.h>
 #include <net-snmp/agent/table_data.h>
 #include <net-snmp/net-snmp-config.h>
 #include <net-snmp/net-snmp-includes.h>
+#include <net-snmp/agent/net-snmp-agent-includes.h>
 
 #include <boost/system/error_code.hpp> // IWYU pragma: keep
 #include <sdbusplus/asio/property.hpp>

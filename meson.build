@@ -5,7 +5,7 @@ project('snmp-agent',
         default_options: [
           'warning_level=3',
           'werror=true',
-          'cpp_std=c++20',
+          'cpp_std=c++23',
           'buildtype=debugoptimized',
         ]
 )
