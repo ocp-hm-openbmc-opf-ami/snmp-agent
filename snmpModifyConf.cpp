@@ -371,8 +371,6 @@ void SetSnmpVersionStatus(const std::string& version, bool setStatus)
     configFileWrite << updatedContent;
     configFileWrite.close();
 
-    std::cout << "SNMP configuration for " << version
-              << " updated successfully." << std::endl;
     controlSystemdService(snmpdServiceName, ServiceAction::Reload);
 }
 
