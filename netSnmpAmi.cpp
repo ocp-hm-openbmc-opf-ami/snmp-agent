@@ -124,10 +124,10 @@ int handle_amiACD_DataArea(netsnmp_mib_handler* handler,
                            netsnmp_agent_request_info* reqinfo,
                            netsnmp_request_info* requests)
 {
+    (void)handler;
+    (void)reginfo;
     int ret = 0;
     uint16_t dataArea = 0;
-    std::cout << "reqinfo->mode " << reqinfo->mode << reginfo->modes
-              << handler->flags << std::endl;
 
     switch (reqinfo->mode)
     {
@@ -202,10 +202,10 @@ int handle_amiACD_Trigger(netsnmp_mib_handler* handler,
                           netsnmp_agent_request_info* reqinfo,
                           netsnmp_request_info* requests)
 {
+    (void)handler;
+    (void)reginfo;
     int ret = 0;
     std::string action;
-    std::cout << "reqinfo->mode " << reqinfo->mode << reginfo->modes
-              << handler->flags << std::endl;
 
     switch (reqinfo->mode)
     {
@@ -276,17 +276,14 @@ int handle_amiSnmpSMTPPriStatus(
     netsnmp_mib_handler* handler, netsnmp_handler_registration* reginfo,
     netsnmp_agent_request_info* reqinfo, netsnmp_request_info* requests)
 {
+    (void)handler;
+    (void)reginfo;
     int ret;
     std::tuple<bool, std::string, uint16_t, std::string> smtpcfg;
     std::vector<std::string> rec;
     DbusUserPropVariant variant;
 
-    std::cout << "handle_amiSnmpSMTPPriStatus" << std::endl;
-
     int status = 1;
-
-    std::cout << "reqinfo->mode " << reqinfo->mode << reginfo->modes
-              << handler->flags << std::endl;
 
     switch (reqinfo->mode)
     {
@@ -350,17 +347,15 @@ int handle_amiSnmpSMTPSecStatus(
     netsnmp_mib_handler* handler, netsnmp_handler_registration* reginfo,
     netsnmp_agent_request_info* reqinfo, netsnmp_request_info* requests)
 {
+    (void)handler;
+    (void)reginfo;
     int ret;
     std::tuple<bool, std::string, uint16_t, std::string> smtpcfg;
     std::vector<std::string> rec;
     DbusUserPropVariant variant;
-    std::cout << "handle_amiSnmpSMTPSecStatus" << std::endl;
     auto bus = sdbusplus::bus::new_default();
 
     int status;
-
-    std::cout << "reqinfo->mode " << reqinfo->mode << reginfo->modes
-              << handler->flags << std::endl;
 
     switch (reqinfo->mode)
     {
