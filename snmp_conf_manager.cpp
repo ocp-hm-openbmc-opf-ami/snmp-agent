@@ -202,7 +202,6 @@ void ConfManager::delete_dbus_object(const char* service,
     {
         // Send the message and wait for a reply
         bus.call(msg);
-        std::cout << "Object deleted successfully." << std::endl;
     }
     catch (const sdbusplus::exception::SdBusError& e)
     {

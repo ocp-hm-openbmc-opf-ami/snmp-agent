@@ -18,7 +18,8 @@ enum class ServiceAction
 {
     Start,
     Stop,
-    Restart
+    Restart,
+    Reload
 };
 
 void controlSystemdService(const std::string& serviceName, ServiceAction action)
@@ -39,6 +40,10 @@ void controlSystemdService(const std::string& serviceName, ServiceAction action)
         else if (action == ServiceAction::Restart)
         {
             methodName = "RestartUnit";
+        }
+        else if (action == ServiceAction::Reload)
+        {
+            methodName = "ReloadUnit";
         }
 
         std::string mode = "replace";
@@ -63,6 +68,10 @@ void controlSystemdService(const std::string& serviceName, ServiceAction action)
         else if (action == ServiceAction::Restart)
         {
             std::cerr << "Failed to Restart service: " << e.what() << std::endl;
+        }
+        else if (action == ServiceAction::Reload)
+        {
+            std::cerr << "Failed to Reload service: " << e.what() << std::endl;
         }
     }
 }
@@ -362,9 +371,7 @@ void SetSnmpVersionStatus(const std::string& version, bool setStatus)
     configFileWrite << updatedContent;
     configFileWrite.close();
 
-    std::cout << "SNMP configuration for " << version
-              << " updated successfully." << std::endl;
-    controlSystemdService(snmpdServiceName, ServiceAction::Restart);
+    controlSystemdService(snmpdServiceName, ServiceAction::Reload);
 }
 
 bool getSnmpVersionStatus(const std::string& version)

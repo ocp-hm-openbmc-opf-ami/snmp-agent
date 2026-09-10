@@ -1424,7 +1424,6 @@ void UserAccess::readUserData()
             userInfo[jsonFixedUser].get<bool>();
     }
 
-    lg2::debug("User data read from IPMI data file");
     iUsrData.close();
     // Update the timestamp
     fileLastUpdatedTime = getUpdatedFileTime();
