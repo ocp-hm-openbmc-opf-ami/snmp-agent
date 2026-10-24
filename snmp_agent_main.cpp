@@ -18,7 +18,8 @@
 #include <future>
 #include <memory>
 /* Need a custom deleter for freeing up sd_event */
-std::string SnmpTrapStatusCreation = "/etc/snmp/SnmpTrapStatus";
+const std::string SnmpTrapStatusCreation = "/etc/snmp/SnmpTrapStatus";
+const std::string SnmpProtocolStatusCreation = "/etc/snmp/SnmpProtocolStatus";
 struct EventDeleter
 {
     void operator()(sd_event* event) const
@@ -31,6 +32,15 @@ using EventPtr = std::unique_ptr<sd_event, EventDeleter>;
 
 int main(int /*argc*/, char** /*argv[]*/)
 {
+    if (!std::filesystem::exists(SnmpProtocolStatusCreation))
+    {
+        std::ofstream file(SnmpProtocolStatusCreation, std::ios::out);
+        if (file.is_open())
+        {
+            file << std::boolalpha << true << std::endl;
+            file.close();
+        }
+    }
     if (!std::filesystem::exists(SnmpTrapStatusCreation))
     {
         std::ofstream file(SnmpTrapStatusCreation, std::ios::out);

@@ -16,7 +16,8 @@
 
 #include <fstream>
 #include <iostream>
-std::string SnmpTrapStatusFile = "/etc/snmp/SnmpTrapStatus";
+const std::string SnmpTrapStatusFile = "/etc/snmp/SnmpTrapStatus";
+const std::string SnmpProtocolStatusFile = "/etc/snmp/SnmpProtocolStatus";
 
 namespace phosphor
 {
@@ -59,6 +60,10 @@ bool readBoolFromFile(std::string& filename)
 
 bool SnmpUtilsManager::sendSNMPTrap()
 {
+    if (!enableSNMPV3() && !enableSNMPV2() && !enableSNMPV1() && !snmpTrapStatus())
+    {
+        throw sdbusplus::xyz::openbmc_project::Common::Error::Unavailable();
+    }
     lg2::info("SNMP trap trigger request ignored: functionality removed");
     return true;
 }
@@ -105,7 +110,7 @@ bool SnmpUtilsManager::enableSNMPV1(bool value)
     currentValue = getSnmpVersionStatus("disableSNMPv1");
     if (value != currentValue)
     {
-        return true;
+        return value;
     }
     if (value == false)
     {
@@ -131,7 +136,7 @@ bool SnmpUtilsManager::enableSNMPV2(bool value)
     currentValue = getSnmpVersionStatus("disableSNMPv2c");
     if (value != currentValue)
     {
-        return true;
+        return value;
     }
     if (value == false)
     {
@@ -157,7 +162,7 @@ bool SnmpUtilsManager::enableSNMPV3(bool value)
     currentValue = getSnmpVersionStatus("disableSNMPv3");
     if (value != currentValue)
     {
-        return true;
+        return value;
     }
     if (value == false)
     {
@@ -175,6 +180,60 @@ bool SnmpUtilsManager::enableSNMPV3() const
     bool currentValue = false;
     currentValue = getSnmpVersionStatus("disableSNMPv3");
     return !currentValue;
+}
+
+bool SnmpUtilsManager::snmpProtocolStatus(bool value)
+{
+    if (value == snmpProtocolStatus())
+    {
+        return value;
+    }
+    std::ofstream file(SnmpProtocolStatusFile, std::ios::out);
+    if (!file.is_open())
+    {
+        std::cerr << "Unable to open file for writing: "
+                  << SnmpProtocolStatusFile << std::endl;
+        return false;
+    }
+
+    file << std::boolalpha << value << std::endl;
+    file.close();
+    if (value == false)
+    {
+        enableSNMPV1(false);
+        enableSNMPV2(false);
+        enableSNMPV3(false);
+        snmpTrapStatus(false);
+        if (system("systemctl stop snmpd.service") == -1)
+        {
+            lg2::error("Stopping the snmpd.service Failed ..");
+        }
+    }
+    else
+    {
+        if (system("systemctl start snmpd.service") == -1)
+        {
+            lg2::error("Starting the snmpd.service Failed ..");
+        }
+    }
+    return value;
+}
+bool SnmpUtilsManager::snmpProtocolStatus() const
+{
+    bool value = false;
+    std::ifstream file(SnmpProtocolStatusFile, std::ios::in);
+    if (!file.is_open())
+    {
+        value = false;
+        std::cerr << "Unable to open file for reading: "
+                  << SnmpProtocolStatusFile << std::endl;
+        return value;
+    }
+
+    file >> std::boolalpha >> value;
+    file.close();
+
+    return value;
 }
 
 std::vector<std::string> SnmpUtilsManager::listSNMPCommunityProfile()
