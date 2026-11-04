@@ -43,6 +43,8 @@ class SnmpUtilsManager : public SNMPIface
     bool sendSNMPTrap() override;
     bool snmpTrapStatus(bool value) override;
     bool snmpTrapStatus() const override;
+    bool snmpProtocolStatus(bool value) override;
+    bool snmpProtocolStatus() const override;
     bool enableSNMPV1(bool value) override;
     bool enableSNMPV1() const override;
     bool enableSNMPV2(bool value) override;
